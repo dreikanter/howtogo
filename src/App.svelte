@@ -295,7 +295,6 @@
 
     <footer>
       <span>Core Go ideas in one visual reference: packages, types, errors, tests, concurrency, and tools.</span>
-      <a href="https://go.dev/doc/" target="_blank" rel="noreferrer">Go documentation ↗</a>
     </footer>
   </div>
 </div>
