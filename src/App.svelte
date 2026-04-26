@@ -282,7 +282,7 @@
   .theme-button { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 0 0 4px var(--glow); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .editor-card, .legend, .cheat-card, .note-card, .operators { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 5px 18px rgba(0,0,0,.16); }
+  .editor-card, .legend, .cheat-card, .note-card, .operators { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
   .editor-card { overflow: hidden; }
   .hierarchy-pad { padding: 0 16px 16px; }
   .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
