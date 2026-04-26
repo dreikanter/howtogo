@@ -118,7 +118,7 @@
 </script>
 
 <svelte:head>
-  <title>How to Go — visual Go cheat sheet</title>
+  <title>Go Concepts & Syntax</title>
   <meta
     name="description"
     content="A visual, searchable Go cheat sheet covering packages, declarations, types, functions, errors, concurrency, and commands."
@@ -149,7 +149,7 @@
     <header class="hero">
       <div>
         <div class="eyebrow">HOW TO GO</div>
-        <h1>Go basics, laid out like a code editor.</h1>
+        <h1>Go Concepts & Syntax</h1>
         <p>
           A visual, Ctrl+F friendly cheat sheet for core Go ideas: module, package, declarations,
           types, control flow, errors, tests, concurrency, and the go command.
