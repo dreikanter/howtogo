@@ -20,7 +20,7 @@
         ['type', 'Names a type. New defined types are distinct from their underlying type.'],
         ['func', 'Declares functions and methods. Methods are functions with receiver parameters.'],
       ],
-      code: `<span class="com">// declaration cheat sheet</span>\n<span class="kw">package</span> main\n\n<span class="kw">import</span> <span class="str">"fmt"</span>\n\n<span class="kw">const</span> Pi = <span class="num">3.14</span>\n<span class="kw">var</span> count <span class="typ">int</span>\n<span class="kw">type</span> User <span class="kw">struct</span>{ Name <span class="typ">string</span> }\n\n<span class="kw">func</span> main() {\n    fmt.Println(Pi, count)\n}`,
+      code: `<span class="kw">package</span> main\n\n<span class="kw">import</span> <span class="str">"fmt"</span>\n\n<span class="kw">const</span> Pi = <span class="num">3.14</span>\n<span class="kw">var</span> count <span class="typ">int</span>\n<span class="kw">type</span> User <span class="kw">struct</span>{ Name <span class="typ">string</span> }\n\n<span class="kw">func</span> main() {\n    fmt.Println(Pi, count)\n}`,
     },
     {
       title: 'Types and zero values',
