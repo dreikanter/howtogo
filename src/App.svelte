@@ -298,18 +298,18 @@
   .note-card p { margin-top: 10px; color: var(--muted); line-height: 1.6; font-size: 13px; }
   .note-card strong { color: var(--ink); }
   .cheatsheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-  .cheat-card { overflow: hidden; }
+  .cheat-card { overflow: hidden; display: flex; flex-direction: column; }
   .cheat-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; padding: 18px 18px 12px; border-bottom: 1px solid var(--rule); }
   h2 { font-size: 18px; letter-spacing: -0.03em; }
   a { color: #58a6ff; text-decoration: none; font-size: 12px; white-space: nowrap; }
   a:hover { text-decoration: underline; }
-  .cheat-body { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .cheat-body { display: flex; flex-direction: column; flex: 1; }
   dl { margin: 0; padding: 14px 18px; }
   dl div { display: grid; grid-template-columns: 155px 1fr; gap: 16px; padding: 9px 0; border-bottom: 1px dashed var(--rule); }
   dl div:last-child { border-bottom: 0; }
   dt { color: var(--op); font-weight: 700; font-size: 13px; }
   dd { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
-  .snippet { border-top: 1px solid var(--rule); background: rgba(0,0,0,.16); padding: 16px 18px; font-size: 12.5px; }
+  .snippet { flex: 1; border-top: 1px solid var(--rule); background: rgba(0,0,0,.16); padding: 16px 18px; font-size: 12.5px; }
   .operators { margin-top: 18px; overflow: hidden; }
   .operator-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
   .operator-grid div { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
