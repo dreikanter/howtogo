@@ -256,6 +256,39 @@
       </div>
     </section>
 
+    <section class="references" aria-label="Go references">
+      <div class="cheat-head">
+        <h2>References</h2>
+        <a href="https://go.dev/doc/" target="_blank" rel="noreferrer">Go documentation ↗</a>
+      </div>
+      <div class="reference-grid">
+        <a href="https://go.dev/ref/spec" target="_blank" rel="noreferrer">
+          <strong>Language Specification</strong>
+          <span>Authoritative syntax and semantics.</span>
+        </a>
+        <a href="https://go.dev/doc/effective_go" target="_blank" rel="noreferrer">
+          <strong>Effective Go</strong>
+          <span>Idioms, naming, interfaces, errors, and style.</span>
+        </a>
+        <a href="https://pkg.go.dev/" target="_blank" rel="noreferrer">
+          <strong>pkg.go.dev</strong>
+          <span>Standard library and module documentation.</span>
+        </a>
+        <a href="https://go.dev/play/" target="_blank" rel="noreferrer">
+          <strong>Go Playground</strong>
+          <span>Run small snippets in the browser.</span>
+        </a>
+        <a href="https://gobyexample.com/" target="_blank" rel="noreferrer">
+          <strong>Go by Example</strong>
+          <span>Practical examples for common features.</span>
+        </a>
+        <a href="https://go.dev/wiki/CodeReviewComments" target="_blank" rel="noreferrer">
+          <strong>Code Review Comments</strong>
+          <span>Concise advice from real Go reviews.</span>
+        </a>
+      </div>
+    </section>
+
     <footer>
       <span>Core Go ideas in one visual reference: packages, types, errors, tests, concurrency, and tools.</span>
       <a href="https://go.dev/doc/" target="_blank" rel="noreferrer">Go documentation ↗</a>
@@ -282,7 +315,7 @@
   .theme-button { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 0 0 4px var(--glow); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .editor-card, .legend, .cheat-card, .note-card, .operators { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+  .editor-card, .legend, .cheat-card, .note-card, .operators, .references { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
   .editor-card { overflow: hidden; }
   .hierarchy-pad { padding: 0 16px 16px; }
   .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
@@ -313,11 +346,13 @@
   dt { color: var(--op); font-weight: 700; font-size: 13px; }
   dd { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
   .snippet { flex: 1; border-top: 1px solid var(--rule); background: rgba(0,0,0,.16); padding: 16px 18px; font-size: 12.5px; }
-  .operators { margin-top: 18px; overflow: hidden; }
-  .operator-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
-  .operator-grid div { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
+  .operators, .references { margin-top: 18px; overflow: hidden; }
+  .operator-grid, .reference-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
+  .operator-grid div, .reference-grid a { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
   code { color: var(--op); font-weight: 800; font-size: 16px; }
-  .operator-grid span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .operator-grid span, .reference-grid span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .reference-grid a { white-space: normal; }
+  .reference-grid strong { color: var(--op); font-size: 13px; }
   footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
   @media (max-width: 960px) {
     .workspace, .cheatsheet, .quick-grid { grid-template-columns: 1fr; }
@@ -327,7 +362,7 @@
     .shell { width: min(100% - 20px, 1180px); padding-top: 18px; }
     .hero { grid-template-columns: 1fr; }
     dl div { grid-template-columns: 1fr; gap: 4px; }
-    .operator-grid { grid-template-columns: 1fr; }
+    .operator-grid, .reference-grid { grid-template-columns: 1fr; }
     footer { flex-direction: column; }
   }
 </style>
