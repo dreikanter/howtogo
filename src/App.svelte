@@ -351,7 +351,8 @@
   .operator-grid div, .reference-grid a { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
   code { color: var(--op); font-weight: 800; font-size: 16px; }
   .operator-grid span, .reference-grid span { color: var(--muted); font-size: 13px; line-height: 1.45; }
-  .reference-grid a { white-space: normal; }
+  .reference-grid a { white-space: normal; transition: background-color 120ms ease; }
+  .reference-grid a:hover { background: var(--soft); text-decoration: none; }
   .reference-grid strong { color: var(--op); font-size: 13px; }
   footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
   @media (max-width: 960px) {
