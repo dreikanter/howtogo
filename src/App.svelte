@@ -106,12 +106,12 @@
   ];
 
   const operators = [
-    [':=', 'short variable declaration, only inside functions'],
-    ['...', 'variadic parameter or argument expansion'],
-    ['& / *', 'address-of and pointer dereference'],
-    ['<-', 'channel send or receive'],
-    ['.(T)', 'type assertion'],
-    ['T(v)', 'conversion, not a cast with magic'],
+    [':=', 'short variable declaration, only inside functions', 'name := "gopher"'],
+    ['...', 'variadic parameter or argument expansion', 'fmt.Println(items...)\nfunc sum(xs ...int) int'],
+    ['& / *', 'address-of and pointer dereference', 'p := &count\nfmt.Println(*p)'],
+    ['<-', 'channel send or receive', 'ch <- value\nvalue := <-ch'],
+    ['.(T)', 'type assertion', 's, ok := v.(string)'],
+    ['T(v)', 'conversion, not a cast with magic', 'n := int64(count)'],
   ];
 
   const toggleTheme = () => (state.theme = state.theme === 'dark' ? 'light' : 'dark');
@@ -250,8 +250,12 @@
         <a href="https://go.dev/ref/spec#Operators_and_punctuation" target="_blank" rel="noreferrer">operators and punctuation ↗</a>
       </div>
       <div class="operator-grid">
-        {#each operators as [mark, meaning]}
-          <div><code>{mark}</code><span>{meaning}</span></div>
+        {#each operators as [mark, meaning, example]}
+          <div>
+            <code>{mark}</code>
+            <span>{meaning}</span>
+            <pre class="operator-example">{example}</pre>
+          </div>
         {/each}
       </div>
     </section>
@@ -263,8 +267,8 @@
       </div>
       <div class="reference-grid">
         <a href="https://go.dev/ref/spec" target="_blank" rel="noreferrer">
-          <strong>Language Specification</strong>
-          <span>Authoritative syntax and semantics.</span>
+          <strong>Go documentation</strong>
+          <span>Language specification: syntax and semantics.</span>
         </a>
         <a href="https://go.dev/doc/effective_go" target="_blank" rel="noreferrer">
           <strong>Effective Go</strong>
@@ -348,9 +352,11 @@
   .snippet { flex: 1; border-top: 1px solid var(--rule); background: rgba(0,0,0,.16); padding: 16px 18px; font-size: 12.5px; }
   .operators, .references { margin-top: 18px; overflow: hidden; }
   .operator-grid, .reference-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
+  .operator-grid { grid-template-columns: repeat(2, 1fr); }
   .operator-grid div, .reference-grid a { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
   code { color: var(--op); font-weight: 800; font-size: 16px; }
   .operator-grid span, .reference-grid span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .operator-example { background: rgba(0,0,0,.16); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.55; }
   .reference-grid a { white-space: normal; transition: background-color 120ms ease; }
   .reference-grid a:hover { background: var(--soft); text-decoration: none; }
   .reference-grid strong { color: var(--op); font-size: 13px; }
