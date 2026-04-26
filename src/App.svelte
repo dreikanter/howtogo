@@ -410,7 +410,7 @@
   h1, h2, p { margin: 0; }
   h1 { max-width: 850px; font-size: clamp(34px, 6vw, 72px); line-height: .95; letter-spacing: -0.06em; }
   .hero p { max-width: 760px; margin-top: 18px; color: var(--muted); line-height: 1.7; font-size: 15px; }
-  .theme-button { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 0 0 4px var(--glow); display: inline-grid; place-items: center; }
+  .theme-button { border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 78%, transparent); color: var(--muted); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.14); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
   .editor-card, .legend, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
@@ -466,9 +466,9 @@
     .legend { position: static; }
   }
   @media (max-width: 620px) {
-    .shell { width: min(100% - 20px, 1180px); padding-top: 18px; }
+    .shell { width: min(100% - 36px, 1180px); padding-top: 18px; }
     .hero { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
-    .theme-button { width: 34px; height: 34px; box-shadow: 0 0 0 3px var(--glow); }
+    .theme-button { width: 34px; height: 34px; box-shadow: 0 1px 2px rgba(0,0,0,.14); }
     dl div { grid-template-columns: 1fr; gap: 4px; }
     .operator-grid, .reference-grid { grid-template-columns: 1fr; }
     footer { flex-direction: column; }
