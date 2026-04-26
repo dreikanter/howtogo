@@ -127,12 +127,12 @@
   ];
 
   const checklist = [
-    'Run gofmt.',
-    'Run go test ./....',
+    'Run <code>gofmt</code>.',
+    'Run <code>go test ./...</code>.',
     'Return errors; do not panic for normal failures.',
     'Keep interfaces small.',
     'Prefer simple structs and functions first.',
-    'Use context.Context for cancellation across API boundaries.',
+    'Use <code>context.Context</code> for cancellation across API boundaries.',
   ];
 
   const traps = [
@@ -304,11 +304,13 @@
     <section class="mindset" aria-label="Go mindset">
       <div class="cheat-head">
         <h2>Go Mindset</h2>
-        <a href="https://go-proverbs.github.io/" target="_blank" rel="noreferrer">Go Proverbs by Rob Pike ↗</a>
       </div>
       <div class="mindset-body">
         <div>
-          <div class="panel-title">Proverbs</div>
+          <div class="panel-title source-title">
+            Proverbs
+            <a href="https://go-proverbs.github.io/" target="_blank" rel="noreferrer">Go Proverbs by Rob Pike ↗</a>
+          </div>
           <ul class="proverb-list">
             {#each proverbs as proverb}
               <li>{proverb}</li>
@@ -319,7 +321,7 @@
           <div class="panel-title">Beginner checklist</div>
           <ul class="check-list">
             {#each checklist as item}
-              <li>{item}</li>
+              <li>{@html item}</li>
             {/each}
           </ul>
         </div>
@@ -458,6 +460,9 @@
   .mindset-body > div { background: var(--panel); padding: 18px; }
   .proverb-list, .check-list { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.65; }
   .proverb-list li::marker, .check-list li::marker { color: var(--op); }
+  .source-title { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  .source-title a { letter-spacing: 0; text-transform: none; font-weight: 500; }
+  :global(.check-list code) { color: var(--op); background: rgba(0,0,0,.16); border: 1px solid var(--rule); border-radius: 6px; padding: 1px 5px; font-size: 12px; }
   .reminders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
   .reminder-card { overflow: hidden; }
   footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
