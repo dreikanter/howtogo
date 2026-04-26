@@ -114,6 +114,47 @@
     ['T(v)', 'conversion, not a cast with magic', 'n := int64(count)'],
   ];
 
+  const proverbs = [
+    'Don’t communicate by sharing memory; share memory by communicating.',
+    'Clear is better than clever.',
+    'A little copying is better than a little dependency.',
+    'Errors are values.',
+    'The bigger the interface, the weaker the abstraction.',
+    'Make the zero value useful.',
+    'Gofmt’s style is no one’s favorite, yet gofmt is everyone’s favorite.',
+    'Documentation is for users.',
+    'Concurrency is not parallelism.',
+  ];
+
+  const checklist = [
+    'Run gofmt.',
+    'Run go test ./....',
+    'Return errors; do not panic for normal failures.',
+    'Keep interfaces small.',
+    'Prefer simple structs and functions first.',
+    'Use context.Context for cancellation across API boundaries.',
+  ];
+
+  const traps = [
+    ['nil slice vs empty slice', 'Both have length 0, but JSON and API behavior may differ.'],
+    ['nil map cannot be assigned into', 'Initialize with make(map[K]V) or a map literal before writes.'],
+    ['loop variable capture', 'Pass loop values into goroutines/closures when needed.'],
+    ['append may allocate', 'Keep the returned slice: s = append(s, v).'],
+    ['map iteration order', 'It is intentionally unspecified; sort keys when order matters.'],
+    ['pointer vs value receiver', 'Pointer receivers can mutate and avoid copying; method sets differ.'],
+    ['exported names need comments', 'Public package identifiers should document what users need to know.'],
+  ];
+
+  const whenToUse = [
+    ['array', 'rarely; fixed size is part of the type'],
+    ['slice', 'usually; flexible view over an array'],
+    ['map', 'lookup by key'],
+    ['struct', 'data shape with named fields'],
+    ['interface', 'behavior and boundaries'],
+    ['channel', 'coordination or ownership transfer'],
+    ['mutex', 'protect shared state'],
+  ];
+
   const toggleTheme = () => (state.theme = state.theme === 'dark' ? 'light' : 'dark');
 </script>
 
@@ -260,6 +301,60 @@
       </div>
     </section>
 
+    <section class="mindset" aria-label="Go mindset">
+      <div class="cheat-head">
+        <h2>Go Mindset</h2>
+        <a href="https://go-proverbs.github.io/" target="_blank" rel="noreferrer">Go Proverbs by Rob Pike ↗</a>
+      </div>
+      <div class="mindset-body">
+        <div>
+          <div class="panel-title">Proverbs</div>
+          <ul class="proverb-list">
+            {#each proverbs as proverb}
+              <li>{proverb}</li>
+            {/each}
+          </ul>
+        </div>
+        <div>
+          <div class="panel-title">Beginner checklist</div>
+          <ul class="check-list">
+            {#each checklist as item}
+              <li>{item}</li>
+            {/each}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="reminders" aria-label="Go reminders">
+      <article class="reminder-card">
+        <div class="cheat-head">
+          <h2>Common traps</h2>
+        </div>
+        <dl>
+          {#each traps as [term, desc]}
+            <div>
+              <dt>{term}</dt>
+              <dd>{desc}</dd>
+            </div>
+          {/each}
+        </dl>
+      </article>
+      <article class="reminder-card">
+        <div class="cheat-head">
+          <h2>When to use what</h2>
+        </div>
+        <dl>
+          {#each whenToUse as [term, desc]}
+            <div>
+              <dt>{term}</dt>
+              <dd>{desc}</dd>
+            </div>
+          {/each}
+        </dl>
+      </article>
+    </section>
+
     <section class="references" aria-label="Go references">
       <div class="cheat-head">
         <h2>References</h2>
@@ -318,7 +413,7 @@
   .theme-button { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 0 0 4px var(--glow); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .editor-card, .legend, .cheat-card, .note-card, .operators, .references { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+  .editor-card, .legend, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
   .editor-card { overflow: hidden; }
   .hierarchy-pad { padding: 0 16px 16px; }
   .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
@@ -349,7 +444,7 @@
   dt { color: var(--op); font-weight: 700; font-size: 13px; }
   dd { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
   .snippet { flex: 1; border-top: 1px solid var(--rule); background: rgba(0,0,0,.16); padding: 16px 18px; font-size: 12.5px; }
-  .operators, .references { margin-top: 18px; overflow: hidden; }
+  .operators, .references, .mindset { margin-top: 18px; overflow: hidden; }
   .operator-grid, .reference-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
   .operator-grid { grid-template-columns: repeat(2, 1fr); }
   .operator-grid div, .reference-grid a { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
@@ -359,9 +454,15 @@
   .reference-grid a { white-space: normal; transition: background-color 120ms ease; }
   .reference-grid a:hover { background: var(--soft); text-decoration: none; }
   .reference-grid strong { color: var(--op); font-size: 13px; }
+  .mindset-body { display: grid; grid-template-columns: 1.25fr .75fr; gap: 1px; background: var(--rule); }
+  .mindset-body > div { background: var(--panel); padding: 18px; }
+  .proverb-list, .check-list { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+  .proverb-list li::marker, .check-list li::marker { color: var(--op); }
+  .reminders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+  .reminder-card { overflow: hidden; }
   footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
   @media (max-width: 960px) {
-    .workspace, .cheatsheet, .quick-grid { grid-template-columns: 1fr; }
+    .workspace, .cheatsheet, .quick-grid, .mindset-body, .reminders { grid-template-columns: 1fr; }
     .legend { position: static; }
   }
   @media (max-width: 620px) {
