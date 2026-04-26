@@ -32,7 +32,7 @@
         ['pointer, slice, map, channel, func, interface', 'nil. Check nil before use where needed.'],
         ['array, struct', 'Each element or field gets its own zero value.'],
       ],
-      code: `<span class="kw">var</span> ok <span class="typ">bool</span>          <span class="com">// false</span>\n<span class="kw">var</span> name <span class="typ">string</span>      <span class="com">// ""</span>\n<span class="kw">var</span> scores []<span class="typ">int</span>    <span class="com">// nil slice</span>\n<span class="kw">var</span> seen <span class="kw">map</span>[<span class="typ">string</span>]<span class="typ">bool</span> <span class="com">// nil map</span>\n<span class="kw">var</span> u <span class="typ">User</span>         <span class="com">// fields zeroed</span>`,
+      code: `<span class="kw">var</span> ok <span class="typ">bool</span>               <span class="com">// false</span>\n<span class="kw">var</span> name <span class="typ">string</span>           <span class="com">// ""</span>\n<span class="kw">var</span> scores []<span class="typ">int</span>          <span class="com">// nil slice</span>\n<span class="kw">var</span> seen <span class="kw">map</span>[<span class="typ">string</span>]<span class="typ">bool</span>  <span class="com">// nil map</span>\n<span class="kw">var</span> u <span class="typ">User</span>                <span class="com">// fields zeroed</span>`,
     },
     {
       title: 'Control flow',
