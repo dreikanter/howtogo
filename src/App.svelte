@@ -360,7 +360,6 @@
     <section class="references" aria-label="Go references">
       <div class="cheat-head">
         <h2>References</h2>
-        <a href="https://go.dev/doc/" target="_blank" rel="noreferrer">Go documentation ↗</a>
       </div>
       <div class="reference-grid">
         <a href="https://go.dev/ref/spec" target="_blank" rel="noreferrer">
