@@ -404,7 +404,7 @@
   }
   :global(*), :global(*::before), :global(*::after) { box-sizing: border-box; }
   .app { min-height: 100vh; transition: background-color 120ms ease, color 120ms ease; }
-  .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 44px; }
+  .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 44px; }
   .hero { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; margin-bottom: 28px; }
   .eyebrow, .panel-title { color: var(--muted); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; }
   .eyebrow { margin-bottom: 18px; }
@@ -470,7 +470,7 @@
     .legend { position: static; }
   }
   @media (max-width: 620px) {
-    .shell { width: min(100% - 36px, 1180px); padding-top: 18px; }
+    .shell { width: min(100% - 36px, 1180px); padding-top: 16px; }
     .hero { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
     .theme-button { width: 34px; height: 34px; box-shadow: 0 1px 2px rgba(0,0,0,.14); }
     dl div { grid-template-columns: 1fr; gap: 4px; }
