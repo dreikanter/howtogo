@@ -121,7 +121,7 @@
   <title>Go Concepts & Syntax</title>
   <meta
     name="description"
-    content="A visual, searchable Go cheat sheet covering packages, declarations, types, functions, errors, concurrency, and commands."
+    content="A visual Go cheat sheet covering packages, declarations, types, functions, errors, concurrency, and commands."
   />
 </svelte:head>
 
@@ -151,8 +151,8 @@
         <div class="eyebrow">HOW TO GO</div>
         <h1>Go Concepts & Syntax</h1>
         <p>
-          A visual, Ctrl+F friendly cheat sheet for core Go ideas: module, package, declarations,
-          types, control flow, errors, tests, concurrency, and the go command.
+          A visual cheat sheet for core Go ideas: module, package, declarations, types,
+          control flow, errors, tests, concurrency, and the go command.
         </p>
       </div>
       <button class="theme-button" type="button" onclick={toggleTheme} aria-label="Switch theme">
@@ -257,7 +257,7 @@
     </section>
 
     <footer>
-      <span>Search tip: press Ctrl+F / Cmd+F for “goroutine”, “zero value”, “append”, “interface”, “go test”, or any keyword.</span>
+      <span>Core Go ideas in one visual reference: packages, types, errors, tests, concurrency, and tools.</span>
       <a href="https://go.dev/doc/" target="_blank" rel="noreferrer">Go documentation ↗</a>
     </footer>
   </div>
