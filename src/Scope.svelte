@@ -1,5 +1,7 @@
 <script>
-  import { state, levels, colors } from './store.svelte.js';
+  import { state, levels, getColors } from './store.svelte.js';
+
+  const colors = $derived(getColors());
 
   let { lv, tagRight = '', children } = $props();
 
