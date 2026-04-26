@@ -157,7 +157,6 @@
       </div>
       <button class="theme-button" type="button" onclick={toggleTheme} aria-label="Switch theme">
         <span>{state.theme === 'dark' ? '☾' : '☀'}</span>
-        {colors.name} theme
       </button>
     </header>
 
@@ -274,13 +273,14 @@
   .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 44px; }
   .hero { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; margin-bottom: 28px; }
   .eyebrow, .panel-title { color: var(--muted); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; }
+  .eyebrow { margin-bottom: 18px; }
   h1, h2, p { margin: 0; }
   h1 { max-width: 850px; font-size: clamp(34px, 6vw, 72px); line-height: .95; letter-spacing: -0.06em; }
   .hero p { max-width: 760px; margin-top: 18px; color: var(--muted); line-height: 1.7; font-size: 15px; }
-  .theme-button { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 10px 14px; font: inherit; cursor: pointer; box-shadow: 0 0 0 4px var(--glow); }
+  .theme-button { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 0 0 4px var(--glow); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .editor-card, .legend, .cheat-card, .note-card, .operators { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 22px 70px rgba(0,0,0,.20); }
+  .editor-card, .legend, .cheat-card, .note-card, .operators { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 5px 18px rgba(0,0,0,.16); }
   .editor-card { overflow: hidden; }
   .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
   .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
