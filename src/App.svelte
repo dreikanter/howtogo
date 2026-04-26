@@ -167,10 +167,11 @@
           <span class="tab">greeter.go</span>
         </div>
 
-        <Scope lv="module" tagRight="go.mod">
-          <pre><span class="com">// go.mod</span>{NL}<span class="kw">module</span> <Tok lv="module">github.com/alex/greeter</Tok>{NL}<span class="kw">go</span> 1.22</pre>
+        <div class="hierarchy-pad">
+          <Scope lv="module" tagRight="go.mod">
+            <pre><span class="com">// go.mod</span>{NL}<span class="kw">module</span> <Tok lv="module">github.com/alex/greeter</Tok>{NL}<span class="kw">go</span> 1.22</pre>
 
-          <Scope lv="pkg" tagRight="directory: greeter/">
+            <Scope lv="pkg" tagRight="directory: greeter/">
             <pre><span class="com">// all files in this directory share one package clause</span>{NL}<span class="kw">package</span> <Tok lv="pkg">greeter</Tok></pre>
 
             <Scope lv="file" tagRight="source file">
@@ -183,8 +184,9 @@
               <Scope lv="method" tagRight="receiver"><pre><span class="kw">func</span> (<Tok lv="param">p</Tok> <span class="typ">Person</span>) <Tok lv="method">Hello</Tok>() <span class="typ">string</span> &lbrace;{NL}{I4}<Tok lv="stmt"><span class="kw">return</span> fmt.Sprintf(<span class="str">"%s, %s"</span>, Greeting, p.Name)</Tok>{NL}&rbrace;</pre></Scope>
               <Scope lv="fn"><pre><span class="kw">func</span> <Tok lv="fn">Shout</Tok>(<Tok lv="param">s</Tok> <span class="typ">string</span>) <span class="typ">string</span> &lbrace;{NL}{I4}<Tok lv="stmt"><span class="kw">return</span> strings.ToUpper(s) + <span class="str">"!"</span></Tok>{NL}&rbrace;</pre></Scope>
             </Scope>
+            </Scope>
           </Scope>
-        </Scope>
+        </div>
       </div>
 
       <aside class="legend" aria-label="Hierarchy legend">
@@ -282,6 +284,7 @@
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
   .editor-card, .legend, .cheat-card, .note-card, .operators { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 5px 18px rgba(0,0,0,.16); }
   .editor-card { overflow: hidden; }
+  .hierarchy-pad { padding: 0 16px 16px; }
   .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
   .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
   .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
