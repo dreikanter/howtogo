@@ -360,7 +360,8 @@
   }
   @media (max-width: 620px) {
     .shell { width: min(100% - 20px, 1180px); padding-top: 18px; }
-    .hero { grid-template-columns: 1fr; }
+    .hero { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+    .theme-button { width: 34px; height: 34px; box-shadow: 0 0 0 3px var(--glow); }
     dl div { grid-template-columns: 1fr; gap: 4px; }
     .operator-grid, .reference-grid { grid-template-columns: 1fr; }
     footer { flex-direction: column; }
