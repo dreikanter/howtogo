@@ -1,5 +1,4 @@
 <script>
-  import { onMount, onDestroy, tick } from 'svelte';
   import { state as app, levels } from './store.svelte.js';
 
   const nodes = [
@@ -71,244 +70,172 @@
     },
   ];
 
-  let wrapperEl;
-  let anchorEls = $state({});
-  let cardEls = $state({});
-  let pathData = $state([]);
-  let pinnedKey = $state(null);
-
-  function activeKey() {
-    if (app.hover && nodes.some((n) => n.key === app.hover)) return app.hover;
-    return pinnedKey;
-  }
-
-  async function computePaths() {
-    if (!wrapperEl) return;
-    await tick();
-    const wrap = wrapperEl.getBoundingClientRect();
-    const out = [];
-    nodes.forEach((node) => {
-      const a = anchorEls[node.key]?.getBoundingClientRect?.();
-      if (!a) return;
-      node.callouts.forEach((_, ci) => {
-        const id = `${node.key}-${ci}`;
-        const c = cardEls[id]?.getBoundingClientRect?.();
-        if (!c) return;
-        const x1 = a.right - wrap.left;
-        const y1 = a.top + a.height / 2 - wrap.top;
-        const x2 = c.left - wrap.left;
-        const y2 = c.top + c.height / 2 - wrap.top;
-        const dx = Math.max(40, (x2 - x1) * 0.45);
-        const d = `M ${x1.toFixed(1)},${y1.toFixed(1)} C ${(x1 + dx).toFixed(1)},${y1.toFixed(1)} ${(x2 - dx).toFixed(1)},${y2.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
-        out.push({ d, key: node.key, hue: levels[node.key].hue });
-      });
-    });
-    pathData = out;
-  }
-
-  let ro;
-  onMount(() => {
-    computePaths();
-    ro = new ResizeObserver(() => computePaths());
-    ro.observe(wrapperEl);
-    window.addEventListener('resize', computePaths);
-  });
-  onDestroy(() => {
-    ro?.disconnect();
-    window.removeEventListener('resize', computePaths);
-  });
+  let currentKey = $state('module');
 
   $effect(() => {
-    app.hover; pinnedKey;
-    computePaths();
+    if (app.hover && nodes.some((n) => n.key === app.hover)) {
+      currentKey = app.hover;
+    }
   });
 
-  const togglePin = (key) => {
-    pinnedKey = pinnedKey === key ? null : key;
-  };
+  const current = $derived(nodes.find((n) => n.key === currentKey));
+  const currentInfo = $derived(levels[currentKey]);
 </script>
 
-<div class="spine-wrap" bind:this={wrapperEl}>
-  <div class="spine">
+<div class="hierarchy">
+  <ul class="spine" role="tablist">
     {#each nodes as node, i (node.key)}
       {#if i > 0}
-        <div class="arrow" aria-hidden="true">↑</div>
+        <li class="arrow" aria-hidden="true">↑</li>
       {/if}
       {@const info = levels[node.key]}
-      {@const isActive = activeKey() === node.key}
-      <div
-        class="node"
-        class:active={isActive}
-        style:--hue={info.hue}
-        onmouseenter={() => (app.hover = node.key)}
-        onmouseleave={() => (app.hover = null)}
-      >
-        <div class="label">{info.label}</div>
-        <div class="sub">{node.sub}</div>
+      {@const isActive = currentKey === node.key}
+      <li>
         <button
           type="button"
-          class="anchor"
-          aria-label="Toggle details for {info.label}"
-          aria-pressed={pinnedKey === node.key}
-          onclick={() => togglePin(node.key)}
-          bind:this={anchorEls[node.key]}
-        ></button>
-      </div>
+          class="node"
+          class:active={isActive}
+          role="tab"
+          aria-selected={isActive}
+          style:--hue={info.hue}
+          onmouseenter={() => (app.hover = node.key)}
+          onmouseleave={() => (app.hover = null)}
+          onfocus={() => (app.hover = node.key)}
+          onblur={() => (app.hover = null)}
+        >
+          <span class="label">{info.label}</span>
+          <span class="sub">{node.sub}</span>
+        </button>
+      </li>
     {/each}
-  </div>
+  </ul>
 
-  <div class="callouts">
-    {#each nodes as node (node.key)}
-      {@const info = levels[node.key]}
-      {@const isActive = activeKey() === node.key}
-      <div class="callout-stack" class:active={isActive} style:--hue={info.hue}>
-        {#each node.callouts as c, ci}
-          <div class="callout" bind:this={cardEls[`${node.key}-${ci}`]}>
-            <div class="callout-title">{c.title}</div>
-            <div class="callout-body">{c.body}</div>
-          </div>
-        {/each}
-      </div>
-    {/each}
+  <div class="details" style:--hue={currentInfo.hue} role="tabpanel">
+    <div class="details-head">
+      <div class="details-label">{currentInfo.label}</div>
+      <div class="details-sub">{current.sub}</div>
+    </div>
+    <ul class="callouts">
+      {#each current.callouts as c}
+        <li>
+          <strong>{c.title}</strong>
+          <span>{c.body}</span>
+        </li>
+      {/each}
+    </ul>
   </div>
-
-  <svg class="leadlines" aria-hidden="true">
-    {#each pathData as p (p.d)}
-      <path
-        d={p.d}
-        class:active={activeKey() === p.key}
-        style:--hue={p.hue}
-      />
-    {/each}
-  </svg>
 </div>
 
 <style>
-  .spine-wrap {
-    position: relative;
+  .hierarchy {
     display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: clamp(40px, 7vw, 96px);
-    padding: 22px 18px 6px;
+    grid-template-columns: 240px 1fr;
+    gap: clamp(20px, 4vw, 40px);
+    padding: 18px;
   }
   .spine {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0;
   }
-  .arrow {
+  .spine .arrow {
     align-self: center;
     color: var(--muted);
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
-    padding: 6px 0;
+    padding: 4px 0;
     user-select: none;
   }
   .node {
-    position: relative;
+    width: 100%;
+    text-align: left;
     border: 1px solid var(--rule);
-    border-left: 3px solid var(--hue);
+    border-left: 3px solid color-mix(in srgb, var(--hue) 35%, var(--rule));
     border-radius: 2px;
-    padding: 12px 28px 12px 14px;
-    background: color-mix(in srgb, var(--hue) 4%, transparent);
-    transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
-    cursor: help;
+    padding: 10px 12px;
+    background: transparent;
+    color: var(--ink);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease;
+    display: block;
+  }
+  .node:hover {
+    background: color-mix(in srgb, var(--hue) 6%, transparent);
   }
   .node.active {
     background: color-mix(in srgb, var(--hue) 12%, transparent);
     border-color: var(--hue);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--hue) 20%, transparent);
   }
   .label {
-    font-family: 'Fraunces', serif;
-    font-size: 11px;
-    letter-spacing: 0.22em;
+    display: block;
+    font-size: 12px;
     font-weight: 700;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--hue) 60%, var(--muted));
+  }
+  .node.active .label,
+  .node:hover .label {
     color: var(--hue);
   }
   .sub {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 3px;
+  }
+  .details {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--hue);
+    border-radius: 2px;
+    padding: 14px 16px 16px;
+    background: color-mix(in srgb, var(--hue) 5%, transparent);
+    min-width: 0;
+  }
+  .details-head {
+    border-bottom: 1px dashed var(--rule);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  .details-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--hue);
+  }
+  .details-sub {
     color: var(--muted);
     font-size: 12px;
     margin-top: 4px;
   }
-  .anchor {
-    position: absolute;
-    top: 50%;
-    right: -7px;
-    transform: translateY(-50%);
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid var(--hue);
-    background: var(--paper);
-    padding: 0;
-    cursor: pointer;
-    transition: transform 120ms ease, background-color 120ms ease;
-  }
-  .anchor:hover { transform: translateY(-50%) scale(1.15); }
-  .node.active .anchor { background: var(--hue); }
   .callouts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    align-self: stretch;
-    justify-content: space-between;
-    padding: 4px 0;
+    gap: 10px;
   }
-  .callout-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    opacity: 0.55;
-    transition: opacity 140ms ease;
+  .callouts li {
+    display: block;
   }
-  .callout-stack.active { opacity: 1; }
-  .callout {
-    border: 1px solid var(--rule);
-    border-left: 2px solid color-mix(in srgb, var(--hue) 60%, var(--rule));
-    border-radius: 2px;
-    padding: 9px 12px;
-    background: color-mix(in srgb, var(--panel) 70%, transparent);
-    transition: border-color 140ms ease, background-color 140ms ease;
-  }
-  .callout-stack.active .callout {
-    border-left-color: var(--hue);
-    background: color-mix(in srgb, var(--hue) 6%, var(--panel));
-  }
-  .callout-title {
+  .callouts strong {
+    display: block;
+    color: var(--ink);
     font-size: 12px;
     font-weight: 700;
-    color: var(--ink);
-    letter-spacing: 0.04em;
   }
-  .callout-body {
+  .callouts span {
+    display: block;
     color: var(--muted);
     font-size: 12px;
     line-height: 1.55;
-    margin-top: 3px;
+    margin-top: 2px;
   }
-  .leadlines {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: visible;
-  }
-  .leadlines path {
-    fill: none;
-    stroke: var(--rule);
-    stroke-width: 1;
-    transition: stroke 140ms ease, stroke-width 140ms ease;
-  }
-  .leadlines path.active {
-    stroke: var(--hue);
-    stroke-width: 1.5;
-  }
-  @media (max-width: 760px) {
-    .spine-wrap { grid-template-columns: 1fr; gap: 18px; }
-    .leadlines { display: none; }
-    .callout-stack { opacity: 1; }
+  @media (max-width: 720px) {
+    .hierarchy { grid-template-columns: 1fr; gap: 16px; padding: 14px; }
   }
 </style>

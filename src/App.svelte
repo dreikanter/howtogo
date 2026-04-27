@@ -3,7 +3,7 @@
   import HierarchySpine from './HierarchySpine.svelte';
   import FileTree from './FileTree.svelte';
   import FileCard from './FileCard.svelte';
-  import { state, levels, getColors, syntax } from './store.svelte.js';
+  import { state, getColors, syntax } from './store.svelte.js';
 
   const colors = $derived(getColors());
 
@@ -201,45 +201,43 @@
     </header>
 
     <section class="workspace" aria-label="Go project hierarchy">
-      <div class="workspace-main">
-        <div class="hierarchy-card">
-          <div class="block-head">
-            <h2>How a Go project nests</h2>
-            <span class="block-sub">workspace ← module ← package ← file ← declaration</span>
-          </div>
-          <HierarchySpine />
+      <div class="hierarchy-card">
+        <div class="block-head">
+          <h2>How a Go project nests</h2>
+        </div>
+        <HierarchySpine />
+      </div>
+
+      <div class="example-card">
+        <div class="block-head">
+          <h2>Example: balanced-brackets module</h2>
+          <a href="https://en.wikipedia.org/wiki/Balanced_parentheses" target="_blank" rel="noreferrer">algorithm ↗</a>
         </div>
 
-        <div class="example-card">
-          <div class="block-head">
-            <h2>Example: balanced-brackets module</h2>
-            <a href="https://en.wikipedia.org/wiki/Balanced_parentheses" target="_blank" rel="noreferrer">algorithm ↗</a>
-          </div>
+        <div class="example-grid">
+          <FileTree />
 
-          <div class="example-grid">
-            <FileTree />
-
-            <div class="files-stack">
-              <FileCard name="go.mod" kind="manifest">
-                <pre><span class="kw">module</span> <Tok lv="module">github.com/alex/brackets</Tok>
+          <div class="files-stack">
+            <FileCard name="go.mod" kind="manifest">
+              <pre><span class="kw">module</span> <Tok lv="module">github.com/alex/brackets</Tok>
 <span class="kw">go</span> 1.22</pre>
-              </FileCard>
+            </FileCard>
 
-              <FileCard name="stack.go">
-                <pre><span class="com">// Package brackets checks whether a string of brackets is balanced.</span>
+            <FileCard name="stack.go">
+              <pre><span class="com">// Package brackets checks whether a string of brackets is balanced.</span>
 <span class="kw">package</span> <Tok lv="pkg">brackets</Tok>
 
-<span class="kw">import</span> <Tok lv="imp"><span class="str">"errors"</span></Tok>
+<span class="kw">import</span> <span class="str">"errors"</span>
 
-<span class="kw">var</span> <Tok lv="vvar">ErrEmpty</Tok> = errors.New(<span class="str">"stack: pop from empty"</span>)
+<span class="kw">var</span> ErrEmpty = errors.New(<span class="str">"stack: pop from empty"</span>)
 
-<span class="kw">type</span> <Tok lv="typ"><span class="typ">Stack</span></Tok> <span class="kw">struct</span> &lbrace;
-    <Tok lv="field">data</Tok> []<span class="typ">rune</span>
+<span class="kw">type</span> <span class="typ">Stack</span> <span class="kw">struct</span> &lbrace;
+    data []<span class="typ">rune</span>
 &rbrace;
 
-<span class="kw">func</span> (<Tok lv="param">s</Tok> *<span class="typ">Stack</span>) <Tok lv="method">Push</Tok>(<Tok lv="param">r</Tok> <span class="typ">rune</span>) &lbrace; s.data = <span class="kw">append</span>(s.data, r) &rbrace;
+<span class="kw">func</span> (s *<span class="typ">Stack</span>) Push(r <span class="typ">rune</span>) &lbrace; s.data = <span class="kw">append</span>(s.data, r) &rbrace;
 
-<span class="kw">func</span> (<Tok lv="param">s</Tok> *<span class="typ">Stack</span>) <Tok lv="method">Pop</Tok>() (<span class="typ">rune</span>, <span class="typ">error</span>) &lbrace;
+<span class="kw">func</span> (s *<span class="typ">Stack</span>) Pop() (<span class="typ">rune</span>, <span class="typ">error</span>) &lbrace;
     <span class="kw">if</span> <span class="kw">len</span>(s.data) == <span class="num">0</span> &lbrace;
         <span class="kw">return</span> <span class="num">0</span>, ErrEmpty
     &rbrace;
@@ -248,23 +246,23 @@
     <span class="kw">return</span> r, <span class="kw">nil</span>
 &rbrace;
 
-<span class="kw">func</span> (<Tok lv="param">s</Tok> *<span class="typ">Stack</span>) <Tok lv="method">Len</Tok>() <span class="typ">int</span> &lbrace; <span class="kw">return</span> <span class="kw">len</span>(s.data) &rbrace;</pre>
-              </FileCard>
+<span class="kw">func</span> (s *<span class="typ">Stack</span>) Len() <span class="typ">int</span> &lbrace; <span class="kw">return</span> <span class="kw">len</span>(s.data) &rbrace;</pre>
+            </FileCard>
 
-              <FileCard name="check.go">
-                <pre><span class="kw">package</span> <Tok lv="pkg">brackets</Tok>
+            <FileCard name="check.go">
+              <pre><span class="kw">package</span> <Tok lv="pkg">brackets</Tok>
 
-<span class="kw">const</span> <Tok lv="konst">Brackets</Tok> = <span class="str">"()[]&lbrace;&rbrace;"</span>
+<span class="kw">const</span> Brackets = <span class="str">"()[]&lbrace;&rbrace;"</span>
 
-<span class="kw">var</span> <Tok lv="vvar">match</Tok> = <span class="kw">map</span>[<span class="typ">rune</span>]<span class="typ">rune</span>&lbrace;
+<span class="kw">var</span> match = <span class="kw">map</span>[<span class="typ">rune</span>]<span class="typ">rune</span>&lbrace;
     <span class="str">')'</span>: <span class="str">'('</span>,
     <span class="str">']'</span>: <span class="str">'['</span>,
     <span class="str">'&rbrace;'</span>: <span class="str">'&lbrace;'</span>,
 &rbrace;
 
 <span class="com">// Balanced reports whether every opening bracket in s has a matching close.</span>
-<span class="kw">func</span> <Tok lv="fn">Balanced</Tok>(<Tok lv="param">s</Tok> <span class="typ">string</span>) <span class="typ">bool</span> &lbrace;
-    <span class="kw">var</span> stack <Tok lv="typ"><span class="typ">Stack</span></Tok>
+<span class="kw">func</span> Balanced(s <span class="typ">string</span>) <span class="typ">bool</span> &lbrace;
+    <span class="kw">var</span> stack <span class="typ">Stack</span>
     <span class="kw">for</span> _, r := <span class="kw">range</span> s &lbrace;
         <span class="kw">switch</span> r &lbrace;
         <span class="kw">case</span> <span class="str">'('</span>, <span class="str">'['</span>, <span class="str">'&lbrace;'</span>:
@@ -278,28 +276,10 @@
     &rbrace;
     <span class="kw">return</span> stack.Len() == <span class="num">0</span>
 &rbrace;</pre>
-              </FileCard>
-            </div>
+            </FileCard>
           </div>
         </div>
       </div>
-
-      <aside class="legend" aria-label="Hierarchy legend">
-        <div class="panel-title">Hover map</div>
-        {#each Object.entries(levels) as [k, v] (k)}
-          {@const active = state.hover === k}
-          <div
-            class="legend-row"
-            class:active
-            onmouseenter={() => (state.hover = k)}
-            onmouseleave={() => (state.hover = null)}
-            style:--accent={v.hue}
-          >
-            <strong>{v.label}</strong>
-            <span>{v.desc}</span>
-          </div>
-        {/each}
-      </aside>
     </section>
 
     <section class="quick-grid" aria-label="quick reference">
@@ -467,22 +447,15 @@
   .hero p { max-width: 760px; margin-top: 18px; color: var(--muted); line-height: 1.7; font-size: 15px; }
   .theme-button { border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 78%, transparent); color: var(--muted); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.14); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
-  .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .workspace-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-  .hierarchy-card, .example-card, .legend, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+  .workspace { display: flex; flex-direction: column; gap: 18px; }
+  .hierarchy-card, .example-card, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
   .hierarchy-card, .example-card { overflow: hidden; }
   .block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 16px 18px 12px; border-bottom: 1px solid var(--rule); }
   .block-head h2 { font-size: 16px; letter-spacing: -0.02em; }
-  .block-sub { color: var(--muted); font-size: 12px; letter-spacing: 0.04em; }
   .example-grid { display: grid; grid-template-columns: 260px 1fr; gap: 18px; padding: 16px 18px 18px; align-items: start; }
   .files-stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   pre { margin: 0; overflow-x: auto; font: 13px/1.7 'JetBrains Mono', ui-monospace, monospace; white-space: pre; color: var(--ink); }
   :global(.kw) { color: var(--kw); font-weight: 650; } :global(.str) { color: var(--str); } :global(.com) { color: var(--com); font-style: italic; } :global(.typ) { color: var(--typ); } :global(.num) { color: var(--num); }
-  .legend { position: sticky; top: 18px; padding: 16px; }
-  .legend-row { border-left: 3px solid transparent; padding: 9px 10px; border-radius: 8px; cursor: help; }
-  .legend-row.active { border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
-  .legend-row strong { display: block; color: var(--accent); font-size: 11px; letter-spacing: .14em; }
-  .legend-row span { display: block; color: var(--muted); margin-top: 4px; font-size: 12px; line-height: 1.45; }
   .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 22px 0; }
   .note-card { padding: 18px; }
   .note-card p { margin-top: 10px; color: var(--muted); line-height: 1.6; font-size: 13px; }
@@ -521,9 +494,8 @@
   .reminder-card { overflow: hidden; }
   footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
   @media (max-width: 960px) {
-    .workspace, .cheatsheet, .quick-grid, .mindset-body, .reminders { grid-template-columns: 1fr; }
+    .cheatsheet, .quick-grid, .mindset-body, .reminders { grid-template-columns: 1fr; }
     .example-grid { grid-template-columns: 1fr; }
-    .legend { position: static; }
   }
   @media (max-width: 620px) {
     .shell { width: min(100% - 36px, 1180px); padding-top: 16px; }
