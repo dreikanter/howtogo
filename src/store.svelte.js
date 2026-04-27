@@ -34,6 +34,11 @@ export const syntax = {
 };
 
 export const levels = {
+  workspace: {
+    label: 'WORKSPACE',
+    hue: '#9aa6b6',
+    desc: 'Optional. A go.work file groups multiple modules for joint development. Most projects skip it.',
+  },
   module: {
     label: 'MODULE',
     hue: '#58a6ff',
@@ -48,6 +53,11 @@ export const levels = {
     label: 'FILE',
     hue: '#f2cc60',
     desc: "A .go source file. Contains top-level declarations; ordering doesn't matter within a package.",
+  },
+  decl: {
+    label: 'DECLARATION',
+    hue: '#d2a8ff',
+    desc: 'A top-level item in a file: const, var, type, or func. Together they form the file body.',
   },
   imp: {
     label: 'IMPORT',

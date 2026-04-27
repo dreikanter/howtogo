@@ -1,12 +1,11 @@
 <script>
-  import Scope from './Scope.svelte';
   import Tok from './Tok.svelte';
+  import HierarchySpine from './HierarchySpine.svelte';
+  import FileTree from './FileTree.svelte';
+  import FileCard from './FileCard.svelte';
   import { state, levels, getColors, syntax } from './store.svelte.js';
 
   const colors = $derived(getColors());
-
-  const NL = '\n';
-  const I4 = '    ';
 
   const cheats = [
     {
@@ -201,32 +200,87 @@
       </button>
     </header>
 
-    <section class="workspace" aria-label="Go hierarchy">
-      <div class="editor-card">
-        <div class="titlebar">
-          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-          <span class="tab">greeter.go</span>
+    <section class="workspace" aria-label="Go project hierarchy">
+      <div class="workspace-main">
+        <div class="hierarchy-card">
+          <div class="block-head">
+            <h2>How a Go project nests</h2>
+            <span class="block-sub">workspace ← module ← package ← file ← declaration</span>
+          </div>
+          <HierarchySpine />
         </div>
 
-        <div class="hierarchy-pad">
-          <Scope lv="module" tagRight="go.mod">
-            <pre><span class="com">// go.mod</span>{NL}<span class="kw">module</span> <Tok lv="module">github.com/alex/greeter</Tok>{NL}<span class="kw">go</span> 1.22</pre>
+        <div class="example-card">
+          <div class="block-head">
+            <h2>Example: balanced-brackets module</h2>
+            <a href="https://en.wikipedia.org/wiki/Balanced_parentheses" target="_blank" rel="noreferrer">algorithm ↗</a>
+          </div>
 
-            <Scope lv="pkg" tagRight="directory: greeter/">
-            <pre><span class="com">// all files in this directory share one package clause</span>{NL}<span class="kw">package</span> <Tok lv="pkg">greeter</Tok></pre>
+          <div class="example-grid">
+            <FileTree />
 
-            <Scope lv="file" tagRight="source file">
-              <pre><span class="kw">package</span> greeter</pre>
+            <div class="files-stack">
+              <FileCard name="go.mod" kind="manifest">
+                <pre><span class="kw">module</span> <Tok lv="module">github.com/alex/brackets</Tok>
+<span class="kw">go</span> 1.22</pre>
+              </FileCard>
 
-              <Scope lv="imp"><pre><span class="kw">import</span> ({NL}{I4}<Tok lv="imp"><span class="str">"fmt"</span></Tok>{NL}{I4}<Tok lv="imp"><span class="str">"strings"</span></Tok>{NL})</pre></Scope>
-              <Scope lv="konst"><pre><span class="kw">const</span> <Tok lv="konst">Greeting</Tok> = <span class="str">"Hello"</span></pre></Scope>
-              <Scope lv="vvar"><pre><span class="kw">var</span> <Tok lv="vvar">defaultName</Tok> <span class="typ">string</span> = <span class="str">"world"</span></pre></Scope>
-              <Scope lv="typ" tagRight="struct"><pre><span class="kw">type</span> <Tok lv="typ"><span class="typ">Person</span></Tok> <span class="kw">struct</span> &lbrace;{NL}{I4}<Tok lv="field">Name</Tok> <span class="typ">string</span>{NL}{I4}<Tok lv="field">Age</Tok>  <span class="typ">int</span>{NL}&rbrace;</pre></Scope>
-              <Scope lv="method" tagRight="receiver"><pre><span class="kw">func</span> (<Tok lv="param">p</Tok> <span class="typ">Person</span>) <Tok lv="method">Hello</Tok>() <span class="typ">string</span> &lbrace;{NL}{I4}<Tok lv="stmt"><span class="kw">return</span> fmt.Sprintf(<span class="str">"%s, %s"</span>, Greeting, p.Name)</Tok>{NL}&rbrace;</pre></Scope>
-              <Scope lv="fn"><pre><span class="kw">func</span> <Tok lv="fn">Shout</Tok>(<Tok lv="param">s</Tok> <span class="typ">string</span>) <span class="typ">string</span> &lbrace;{NL}{I4}<Tok lv="stmt"><span class="kw">return</span> strings.ToUpper(s) + <span class="str">"!"</span></Tok>{NL}&rbrace;</pre></Scope>
-            </Scope>
-            </Scope>
-          </Scope>
+              <FileCard name="stack.go">
+                <pre><span class="com">// Package brackets checks whether a string of brackets is balanced.</span>
+<span class="kw">package</span> <Tok lv="pkg">brackets</Tok>
+
+<span class="kw">import</span> <Tok lv="imp"><span class="str">"errors"</span></Tok>
+
+<span class="kw">var</span> <Tok lv="vvar">ErrEmpty</Tok> = errors.New(<span class="str">"stack: pop from empty"</span>)
+
+<span class="kw">type</span> <Tok lv="typ"><span class="typ">Stack</span></Tok> <span class="kw">struct</span> &lbrace;
+    <Tok lv="field">data</Tok> []<span class="typ">rune</span>
+&rbrace;
+
+<span class="kw">func</span> (<Tok lv="param">s</Tok> *<span class="typ">Stack</span>) <Tok lv="method">Push</Tok>(<Tok lv="param">r</Tok> <span class="typ">rune</span>) &lbrace; s.data = <span class="kw">append</span>(s.data, r) &rbrace;
+
+<span class="kw">func</span> (<Tok lv="param">s</Tok> *<span class="typ">Stack</span>) <Tok lv="method">Pop</Tok>() (<span class="typ">rune</span>, <span class="typ">error</span>) &lbrace;
+    <span class="kw">if</span> <span class="kw">len</span>(s.data) == <span class="num">0</span> &lbrace;
+        <span class="kw">return</span> <span class="num">0</span>, ErrEmpty
+    &rbrace;
+    r := s.data[<span class="kw">len</span>(s.data)-<span class="num">1</span>]
+    s.data = s.data[:<span class="kw">len</span>(s.data)-<span class="num">1</span>]
+    <span class="kw">return</span> r, <span class="kw">nil</span>
+&rbrace;
+
+<span class="kw">func</span> (<Tok lv="param">s</Tok> *<span class="typ">Stack</span>) <Tok lv="method">Len</Tok>() <span class="typ">int</span> &lbrace; <span class="kw">return</span> <span class="kw">len</span>(s.data) &rbrace;</pre>
+              </FileCard>
+
+              <FileCard name="check.go">
+                <pre><span class="kw">package</span> <Tok lv="pkg">brackets</Tok>
+
+<span class="kw">const</span> <Tok lv="konst">Brackets</Tok> = <span class="str">"()[]&lbrace;&rbrace;"</span>
+
+<span class="kw">var</span> <Tok lv="vvar">match</Tok> = <span class="kw">map</span>[<span class="typ">rune</span>]<span class="typ">rune</span>&lbrace;
+    <span class="str">')'</span>: <span class="str">'('</span>,
+    <span class="str">']'</span>: <span class="str">'['</span>,
+    <span class="str">'&rbrace;'</span>: <span class="str">'&lbrace;'</span>,
+&rbrace;
+
+<span class="com">// Balanced reports whether every opening bracket in s has a matching close.</span>
+<span class="kw">func</span> <Tok lv="fn">Balanced</Tok>(<Tok lv="param">s</Tok> <span class="typ">string</span>) <span class="typ">bool</span> &lbrace;
+    <span class="kw">var</span> stack <Tok lv="typ"><span class="typ">Stack</span></Tok>
+    <span class="kw">for</span> _, r := <span class="kw">range</span> s &lbrace;
+        <span class="kw">switch</span> r &lbrace;
+        <span class="kw">case</span> <span class="str">'('</span>, <span class="str">'['</span>, <span class="str">'&lbrace;'</span>:
+            stack.Push(r)
+        <span class="kw">case</span> <span class="str">')'</span>, <span class="str">']'</span>, <span class="str">'&rbrace;'</span>:
+            top, err := stack.Pop()
+            <span class="kw">if</span> err != <span class="kw">nil</span> || top != match[r] &lbrace;
+                <span class="kw">return</span> <span class="kw">false</span>
+            &rbrace;
+        &rbrace;
+    &rbrace;
+    <span class="kw">return</span> stack.Len() == <span class="num">0</span>
+&rbrace;</pre>
+              </FileCard>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -414,13 +468,14 @@
   .theme-button { border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 78%, transparent); color: var(--muted); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.14); display: inline-grid; place-items: center; }
   .theme-button span { display: inline-block; width: 1.4em; }
   .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .editor-card, .legend, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
-  .editor-card { overflow: hidden; }
-  .hierarchy-pad { padding: 0 16px 16px; }
-  .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
-  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-  .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
-  .tab { margin-left: 10px; font-size: 12px; }
+  .workspace-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .hierarchy-card, .example-card, .legend, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+  .hierarchy-card, .example-card { overflow: hidden; }
+  .block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 16px 18px 12px; border-bottom: 1px solid var(--rule); }
+  .block-head h2 { font-size: 16px; letter-spacing: -0.02em; }
+  .block-sub { color: var(--muted); font-size: 12px; letter-spacing: 0.04em; }
+  .example-grid { display: grid; grid-template-columns: 260px 1fr; gap: 18px; padding: 16px 18px 18px; align-items: start; }
+  .files-stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   pre { margin: 0; overflow-x: auto; font: 13px/1.7 'JetBrains Mono', ui-monospace, monospace; white-space: pre; color: var(--ink); }
   :global(.kw) { color: var(--kw); font-weight: 650; } :global(.str) { color: var(--str); } :global(.com) { color: var(--com); font-style: italic; } :global(.typ) { color: var(--typ); } :global(.num) { color: var(--num); }
   .legend { position: sticky; top: 18px; padding: 16px; }
@@ -467,6 +522,7 @@
   footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
   @media (max-width: 960px) {
     .workspace, .cheatsheet, .quick-grid, .mindset-body, .reminders { grid-template-columns: 1fr; }
+    .example-grid { grid-template-columns: 1fr; }
     .legend { position: static; }
   }
   @media (max-width: 620px) {
