@@ -10,9 +10,11 @@ export const colors = {
 // Sections of the cheatsheet. Each item has a stable `id`, the label shown in
 // the list, a one-line summary, and (optionally) a code example to render on
 // the right. Items without `code` show their summary in the right pane.
+// `hue` is a muted color used for gentle sidebar coding (section title + dot).
 export const sections = [
   {
     title: 'Structure',
+    hue: '#d68a5a',
     items: [
       {
         id: 'workspace',
@@ -62,6 +64,7 @@ package greeter
   },
   {
     title: 'Inside a file',
+    hue: '#7fa39e',
     items: [
       { id: 'package-clause', label: 'package clause', summary: 'package foo — first non-comment line of every file.' },
       { id: 'import', label: 'import declaration', summary: 'Brings names from other packages into the file.' },
@@ -75,6 +78,7 @@ package greeter
   },
   {
     title: 'Declarations',
+    hue: '#a3a371',
     items: [
       {
         id: 'const',
@@ -117,12 +121,14 @@ var (
   },
   {
     title: 'Labeled',
+    hue: '#a387a8',
     items: [
       { id: 'label', label: 'Name:', summary: 'Target for goto / break / continue.' },
     ],
   },
   {
     title: 'Simple statements',
+    hue: '#b09269',
     items: [
       { id: 'assign', label: '=', summary: 'Assignment.' },
       { id: 'expr-stmt', label: 'expression', summary: 'Bare call like f() evaluated for its effect.' },
@@ -132,6 +138,7 @@ var (
   },
   {
     title: 'Control flow',
+    hue: '#c08070',
     items: [
       {
         id: 'if',
@@ -191,6 +198,7 @@ case string: fmt.Println("string", v)
   },
   {
     title: 'Concurrency / cleanup',
+    hue: '#7892b0',
     items: [
       { id: 'go', label: 'go', summary: 'Start a goroutine.' },
       {
@@ -215,6 +223,7 @@ defer fmt.Println("two")`,
   },
   {
     title: 'Block',
+    hue: '#909090',
     items: [
       { id: 'bare-block', label: '{ ... }', summary: 'Bare block as a statement; rare but legal, introduces scope.' },
     ],
