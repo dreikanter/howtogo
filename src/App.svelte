@@ -49,8 +49,8 @@
     style:border-color={colors.rule}
   >
     <div class="brand" style:border-color={colors.rule}>
-      <div class="brand-title" style:color={colors.accent}>Go cheatsheet</div>
-      <div class="brand-sub" style:color={colors.muted}>a field guide</div>
+      <div class="brand-title" style:color={colors.accent}>How To Go</div>
+      <div class="brand-sub" style:color={colors.muted}>Concepts &amp; Syntax</div>
     </div>
 
     {#each sections as section (section.title)}
@@ -134,7 +134,7 @@
   }
 
   .brand {
-    padding: 22px 16px 16px;
+    padding: 16px;
     border-bottom: 1px solid;
     margin-bottom: 14px;
   }
