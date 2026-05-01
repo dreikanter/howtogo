@@ -79,9 +79,6 @@
                 {#if item.hint}
                   <span class="hint" style:color={colors.muted}>{item.hint}</span>
                 {/if}
-                {#if item.code}
-                  <span class="dot" style:background-color={section.hue} aria-hidden="true"></span>
-                {/if}
               </button>
             </li>
           {/each}
@@ -193,16 +190,6 @@
   }
   .item .hint {
     font-size: 11px;
-  }
-  .item .dot {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    transform: translateY(-50%);
-    opacity: 0.85;
   }
 
   .pane {

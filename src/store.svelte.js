@@ -58,7 +58,17 @@ package greeter
       {
         id: 'file',
         label: 'file',
-        summary: 'A single .go source file.',
+        summary: 'A .go source file. Files in one package see each other freely; declaration order does not matter.',
+        code: `// greeter/hello.go
+package greeter
+
+import "fmt"
+
+// Hello can call sayBye even though it lives in another file
+// of the same package, declared above or below — order is irrelevant.
+func Hello(name string) string {
+    return fmt.Sprintf("hi %s; %s", name, sayBye())
+}`,
       },
     ],
   },
@@ -66,14 +76,117 @@ package greeter
     title: 'Inside a file',
     hue: '#9bc7c1',
     items: [
-      { id: 'package-clause', label: 'package clause', summary: 'package foo — first non-comment line of every file.' },
-      { id: 'import', label: 'import declaration', summary: 'Brings names from other packages into the file.' },
-      { id: 'top-level-decl', label: 'top-level declaration', summary: 'const / var / type / func at file scope.' },
-      { id: 'declaration', label: 'declaration', summary: 'Introduces a name; valid at file scope and (mostly) inside functions.' },
-      { id: 'statement', label: 'statement', summary: 'Unit of execution inside a function body.' },
-      { id: 'block', label: 'block', summary: '{ ... } — group of statements, defines a new scope.' },
-      { id: 'type-literal', label: 'type literal', summary: 'struct/interface/map/chan/func/[]T/[N]T/*T — the right-hand side of a type decl.' },
-      { id: 'expression', label: 'expression', summary: 'Evaluates to a value.' },
+      {
+        id: 'package-clause',
+        label: 'package clause',
+        summary: 'First non-comment line of every .go file. All files in a directory share one clause.',
+        code: `package greeter   // every file in greeter/ starts with this
+
+package main      // special: produces an executable with main()`,
+      },
+      {
+        id: 'import',
+        label: 'import declaration',
+        summary: 'Pulls another package\'s exported (Capitalized) names into this file.',
+        code: `import "fmt"   // single import
+
+import (
+    "fmt"
+    "strings"
+
+    "github.com/google/uuid"          // third-party
+    log "github.com/sirupsen/logrus"  // local alias
+    _ "image/png"                     // blank: run init only
+)`,
+      },
+      {
+        id: 'top-level-decl',
+        label: 'top-level declaration',
+        summary: 'const / var / type / func at file scope. Capitalized names are exported.',
+        code: `package greeter
+
+const Greeting = "hi"           // exported constant
+var   defaultName = "world"     // package-private variable
+type  Greeter struct{ Name string }
+func  Hello() string { return Greeting }`,
+      },
+      {
+        id: 'declaration',
+        label: 'declaration',
+        summary: 'Binds a name to a value, type, or function. Valid at file scope; most are also valid inside funcs.',
+        code: `// File scope: const, var, type, func
+const Pi = 3.14
+var   n  int
+type  Meters float64
+func  add(a, b int) int { return a + b }
+
+func work() {
+    // Inside a function: const, var, type, plus :=
+    const limit = 10
+    var   buf []byte
+    type  local struct{ x int }
+    name := "go"   // := is function-only
+    _ = name
+}`,
+      },
+      {
+        id: 'statement',
+        label: 'statement',
+        summary: 'A unit of execution: assignments, calls, control flow. Lives inside function bodies.',
+        code: `func work() {
+    x := 1                  // short declaration
+    x++                     // increment
+    fmt.Println(x)          // expression used as statement
+    if x > 0 { return }     // control flow
+    for i := 0; i < 3; i++ {
+        fmt.Println(i)
+    }
+}`,
+      },
+      {
+        id: 'block',
+        label: 'block',
+        summary: '{ ... } groups statements and opens a new scope. Function, if, for, switch bodies are all blocks.',
+        code: `func main() {
+    {                       // bare block — new scope
+        msg := "inner"
+        fmt.Println(msg)
+    }
+    // msg is not visible here
+
+    if x := 10; x > 0 {     // x is scoped to this block (and its else)
+        fmt.Println(x)
+    }
+}`,
+      },
+      {
+        id: 'type-literal',
+        label: 'type literal',
+        summary: 'The shape on the right of a type decl: struct, interface, slice, map, chan, func, pointer, array.',
+        code: `type User    struct{ Name string; Age int }
+type Reader  interface{ Read(p []byte) (int, error) }
+type Bytes   []byte                       // slice
+type Pair    [2]int                       // array
+type Cache   map[string]int                // map
+type Done    chan struct{}                 // chan
+type Handler func(req string) error        // func
+type IntPtr  *int                          // pointer`,
+      },
+      {
+        id: 'expression',
+        label: 'expression',
+        summary: 'Anything that evaluates to a value: literals, operators, calls, field/index access.',
+        code: `1 + 2                  // arithmetic
+"go" + "lang"          // string concat
+len(s) > 0             // comparison → bool
+strings.ToUpper(s)     // call
+user.Name              // field access
+m["key"]               // map index
+&u                     // address-of, yields *User
+
+// A bare call used as a statement just discards its value.
+fmt.Println("hello")`,
+      },
     ],
   },
   {
