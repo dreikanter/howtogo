@@ -15,5 +15,8 @@
     "svelte": "^5.20.2",
     "vite": "^6.0.11",
     "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "highlight.js": "^11.11.1"
   }
 }
