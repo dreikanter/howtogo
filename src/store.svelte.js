@@ -1,9 +1,10 @@
 export const colors = {
-  ink: '#1a1614',
-  paper: '#f4efe6',
-  rule: '#d9d2c2',
-  muted: '#6b6254',
-  accent: '#8a3a2a',
+  ink: '#d8d4cc',
+  paper: '#15130f',
+  panel: '#1c1a16',
+  rule: '#2e2a24',
+  muted: '#7a7368',
+  accent: '#d68a5a',
 };
 
 // Sections of the cheatsheet. Each item has a stable `id`, the label shown in
