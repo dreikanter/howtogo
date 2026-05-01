@@ -88,9 +88,7 @@ export const sections = layout.map((s) => ({
   items: s.ids.map(resolve),
 }));
 
-const firstWithCode = sections.flatMap((s) => s.items).find((i) => i.code);
-
 export const state = $state({
-  selectedId: firstWithCode?.id ?? sections[0].items[0].id,
+  selectedId: sections[0].items[0].id,
   sidebarOpen: false,
 });
