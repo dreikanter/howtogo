@@ -1,10 +1,10 @@
 export const colors = {
-  ink: '#d8d4cc',
+  ink: '#e6e2d8',
   paper: '#15130f',
   panel: '#1c1a16',
-  rule: '#2e2a24',
-  muted: '#7a7368',
-  accent: '#d68a5a',
+  rule: '#3a352e',
+  muted: '#9a9286',
+  accent: '#e89868',
 };
 
 // Sections of the cheatsheet. Each item has a stable `id`, the label shown in
@@ -14,7 +14,7 @@ export const colors = {
 export const sections = [
   {
     title: 'Structure',
-    hue: '#d68a5a',
+    hue: '#e89868',
     items: [
       {
         id: 'workspace',
@@ -64,7 +64,7 @@ package greeter
   },
   {
     title: 'Inside a file',
-    hue: '#7fa39e',
+    hue: '#9bc7c1',
     items: [
       { id: 'package-clause', label: 'package clause', summary: 'package foo — first non-comment line of every file.' },
       { id: 'import', label: 'import declaration', summary: 'Brings names from other packages into the file.' },
@@ -78,7 +78,7 @@ package greeter
   },
   {
     title: 'Declarations',
-    hue: '#a3a371',
+    hue: '#c4c486',
     items: [
       {
         id: 'const',
@@ -121,14 +121,14 @@ var (
   },
   {
     title: 'Labeled',
-    hue: '#a387a8',
+    hue: '#c5a5cc',
     items: [
       { id: 'label', label: 'Name:', summary: 'Target for goto / break / continue.' },
     ],
   },
   {
     title: 'Simple statements',
-    hue: '#b09269',
+    hue: '#d4b082',
     items: [
       { id: 'assign', label: '=', summary: 'Assignment.' },
       { id: 'expr-stmt', label: 'expression', summary: 'Bare call like f() evaluated for its effect.' },
@@ -138,7 +138,7 @@ var (
   },
   {
     title: 'Control flow',
-    hue: '#c08070',
+    hue: '#e29c8e',
     items: [
       {
         id: 'if',
@@ -198,7 +198,7 @@ case string: fmt.Println("string", v)
   },
   {
     title: 'Concurrency / cleanup',
-    hue: '#7892b0',
+    hue: '#9ab1d4',
     items: [
       { id: 'go', label: 'go', summary: 'Start a goroutine.' },
       {
@@ -223,7 +223,7 @@ defer fmt.Println("two")`,
   },
   {
     title: 'Block',
-    hue: '#909090',
+    hue: '#b0b0b0',
     items: [
       { id: 'bare-block', label: '{ ... }', summary: 'Bare block as a statement; rare but legal, introduces scope.' },
     ],
@@ -233,4 +233,7 @@ defer fmt.Println("two")`,
 // Default selection: first item with a code example.
 const firstWithCode = sections.flatMap((s) => s.items).find((i) => i.code);
 
-export const state = $state({ selectedId: firstWithCode?.id ?? sections[0].items[0].id });
+export const state = $state({
+  selectedId: firstWithCode?.id ?? sections[0].items[0].id,
+  sidebarOpen: false,
+});

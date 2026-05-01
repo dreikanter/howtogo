@@ -11,10 +11,48 @@
   const highlighted = $derived(
     selected?.code ? hljs.highlight(selected.code, { language: 'go' }).value : ''
   );
+
+  function selectItem(id) {
+    state.selectedId = id;
+    state.sidebarOpen = false;
+  }
 </script>
 
 <div class="layout" style:background-color={colors.paper} style:color={colors.ink}>
-  <nav class="list" style:background-color={colors.panel} style:border-color={colors.rule}>
+  <button
+    type="button"
+    class="hamburger"
+    class:open={state.sidebarOpen}
+    style:background-color={colors.panel}
+    style:border-color={colors.rule}
+    style:color={colors.ink}
+    aria-label={state.sidebarOpen ? 'Close navigation' : 'Open navigation'}
+    aria-expanded={state.sidebarOpen}
+    onclick={() => (state.sidebarOpen = !state.sidebarOpen)}
+  >
+    <span></span><span></span><span></span>
+  </button>
+
+  {#if state.sidebarOpen}
+    <button
+      type="button"
+      class="backdrop"
+      aria-label="Close navigation"
+      onclick={() => (state.sidebarOpen = false)}
+    ></button>
+  {/if}
+
+  <nav
+    class="list"
+    class:open={state.sidebarOpen}
+    style:background-color={colors.panel}
+    style:border-color={colors.rule}
+  >
+    <div class="brand" style:border-color={colors.rule}>
+      <div class="brand-title" style:color={colors.accent}>Go cheatsheet</div>
+      <div class="brand-sub" style:color={colors.muted}>a field guide</div>
+    </div>
+
     {#each sections as section (section.title)}
       <div class="section">
         <div
@@ -34,8 +72,8 @@
                 class:active
                 style:color={active ? section.hue : colors.ink}
                 style:border-left-color={active ? section.hue : 'transparent'}
-                style:background-color={active ? section.hue + '14' : 'transparent'}
-                onclick={() => (state.selectedId = item.id)}
+                style:background-color={active ? section.hue + '1f' : 'transparent'}
+                onclick={() => selectItem(item.id)}
               >
                 <span class="label">{item.label}</span>
                 {#if item.hint}
@@ -92,8 +130,26 @@
     height: 100vh;
     overflow-y: auto;
     border-right: 1px solid;
-    padding: 18px 0;
+    padding: 0 0 18px;
   }
+
+  .brand {
+    padding: 22px 16px 16px;
+    border-bottom: 1px solid;
+    margin-bottom: 14px;
+  }
+  .brand-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .brand-sub {
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
   .section + .section {
     margin-top: 22px;
   }
@@ -105,7 +161,6 @@
     margin: 0 16px 8px;
     padding-bottom: 6px;
     border-bottom: 1px dashed;
-    opacity: 0.85;
   }
   .list ul {
     list-style: none;
@@ -131,7 +186,7 @@
     position: relative;
   }
   .item:hover:not(.active) {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.04);
   }
   .item .label {
     flex: 0 0 auto;
@@ -147,7 +202,7 @@
     height: 4px;
     border-radius: 50%;
     transform: translateY(-50%);
-    opacity: 0.65;
+    opacity: 0.85;
   }
 
   .pane {
@@ -167,7 +222,6 @@
     font-weight: 600;
     text-transform: uppercase;
     margin-bottom: 8px;
-    opacity: 0.9;
   }
   .pane-head h2 {
     font-family: inherit;
@@ -197,28 +251,28 @@
   }
 
   /* hljs token colors tuned for the warm dark palette */
-  :global(.hljs) { background: transparent; color: #d8d4cc; }
+  :global(.hljs) { background: transparent; color: #e6e2d8; }
   :global(.hljs-comment),
-  :global(.hljs-quote)         { color: #6a625a; font-style: italic; }
+  :global(.hljs-quote)         { color: #847b6e; font-style: italic; }
   :global(.hljs-keyword),
   :global(.hljs-selector-tag),
-  :global(.hljs-literal)       { color: #d68a5a; }
+  :global(.hljs-literal)       { color: #e89868; }
   :global(.hljs-string),
   :global(.hljs-regexp),
-  :global(.hljs-doctag)        { color: #9aa86a; }
-  :global(.hljs-number)        { color: #c8956a; }
+  :global(.hljs-doctag)        { color: #b6c382; }
+  :global(.hljs-number)        { color: #dba87e; }
   :global(.hljs-type),
   :global(.hljs-built_in),
-  :global(.hljs-builtin-name)  { color: #7fa39e; }
+  :global(.hljs-builtin-name)  { color: #9bc7c1; }
   :global(.hljs-title),
   :global(.hljs-title.function_),
-  :global(.hljs-section)       { color: #c9b884; }
+  :global(.hljs-section)       { color: #dccea0; }
   :global(.hljs-params),
   :global(.hljs-variable),
-  :global(.hljs-attr)          { color: #d8d4cc; }
-  :global(.hljs-meta)          { color: #7892b0; }
+  :global(.hljs-attr)          { color: #e6e2d8; }
+  :global(.hljs-meta)          { color: #9ab1d4; }
   :global(.hljs-symbol),
-  :global(.hljs-bullet)        { color: #a387a8; }
+  :global(.hljs-bullet)        { color: #c5a5cc; }
 
   .placeholder {
     font-style: italic;
@@ -227,19 +281,80 @@
     text-align: center;
   }
 
+  /* hamburger + backdrop, hidden on desktop */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 30;
+    width: 40px;
+    height: 40px;
+    padding: 10px 9px;
+    border: 1px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    font: inherit;
+  }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 1px;
+    transition: transform 180ms ease, opacity 180ms ease;
+    transform-origin: center;
+  }
+  .hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
   @media (max-width: 820px) {
     .layout {
       grid-template-columns: 1fr;
-      height: auto;
-      width: auto;
     }
-    .list,
     .pane {
-      height: auto;
+      padding: 64px 20px 32px;
+      max-width: none;
+    }
+    .hamburger {
+      display: flex;
+    }
+    .backdrop {
+      display: block;
     }
     .list {
-      border-right: none;
-      border-bottom: 1px solid;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      max-width: 85vw;
+      z-index: 25;
+      transform: translateX(-100%);
+      transition: transform 220ms ease;
+      box-shadow: 6px 0 24px rgba(0, 0, 0, 0.4);
+    }
+    .list.open {
+      transform: translateX(0);
     }
   }
 </style>
