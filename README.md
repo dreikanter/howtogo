@@ -61,17 +61,41 @@ via the Cloudflare dashboard.
 ## Project layout
 
 ```
-index.html                # entry HTML, loads Google Fonts from CDN
+index.html                # entry HTML, loads JetBrains Mono from CDN
+content/                  # one Markdown file per sidebar article
 src/
   main.js                 # mounts the Svelte app
-  App.svelte              # full page, header, code, legend, footer
-  Scope.svelte            # nested scope wrapper
-  Tok.svelte              # hoverable token
-  store.svelte.js         # shared state + level metadata
+  App.svelte              # sidebar nav + article pane
+  store.svelte.js         # sidebar layout + selection state
+vite-plugin-content.js    # compiles content/*.md → virtual:content JSON
 vite.config.js
 svelte.config.js
 wrangler.jsonc            # Cloudflare Workers static-assets config
 ```
 
-Fonts (Fraunces, JetBrains Mono) are pulled from the Google Fonts CDN at
-runtime — no font files in the repo.
+### Adding or editing an article
+
+Each sidebar item lives in `content/<id>.md`:
+
+```markdown
+---
+id: my-topic
+label: my topic
+hint: optional sidebar hint
+ref: https://go.dev/ref/spec#Section
+---
+
+One short summary paragraph.
+
+​```go
+// idiomatic example
+​```
+```
+
+Then add the `id` to the appropriate section in
+`src/store.svelte.js`. The `howtogo-content` Vite plugin parses every
+`.md` file at build time and exposes them as a JSON module
+(`virtual:content`).
+
+JetBrains Mono is pulled from the Google Fonts CDN at runtime — no font
+files in the repo.

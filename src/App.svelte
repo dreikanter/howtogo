@@ -1,480 +1,373 @@
 <script>
-  import Scope from './Scope.svelte';
-  import Tok from './Tok.svelte';
-  import { state, levels, getColors, syntax } from './store.svelte.js';
+  import hljs from 'highlight.js/lib/core';
+  import go from 'highlight.js/lib/languages/go';
+  import { state, sections, colors } from './store.svelte.js';
 
-  const colors = $derived(getColors());
+  hljs.registerLanguage('go', go);
 
-  const NL = '\n';
-  const I4 = '    ';
+  const allItems = sections.flatMap((s) => s.items);
+  const selected = $derived(allItems.find((i) => i.id === state.selectedId));
+  const selectedSection = $derived(sections.find((s) => s.items.includes(selected)));
+  const highlighted = $derived(
+    selected?.code ? hljs.highlight(selected.code, { language: 'go' }).value : ''
+  );
 
-  const cheats = [
-    {
-      title: 'Declarations',
-      ref: 'https://go.dev/ref/spec#Declarations_and_scope',
-      items: [
-        ['package', 'First line in every source file. Files in one directory usually share one package name.'],
-        ['import', 'Imports packages; only exported identifiers (Capitalized) are accessible from other packages.'],
-        ['const', 'Compile-time values. Untyped constants are flexible until used. iota counts lines in a const block.'],
-        ['var', 'Zero-valued mutable binding. Package vars initialize before init().'],
-        ['type', 'Names a type. New defined types are distinct from their underlying type.'],
-        ['func', 'Declares functions and methods. Methods are functions with receiver parameters.'],
-      ],
-      code: `<span class="kw">package</span> main\n\n<span class="kw">import</span> <span class="str">"fmt"</span>\n\n<span class="kw">const</span> Pi = <span class="num">3.14</span>\n<span class="kw">var</span> count <span class="typ">int</span>\n<span class="kw">type</span> User <span class="kw">struct</span>{ Name <span class="typ">string</span> }\n\n<span class="kw">func</span> main() {\n    fmt.Println(Pi, count)\n}`,
-    },
-    {
-      title: 'Types and zero values',
-      ref: 'https://go.dev/ref/spec#Types',
-      items: [
-        ['bool', 'false'],
-        ['string', '""; immutable bytes, often UTF-8 text.'],
-        ['int, float64, complex128', '0, 0.0, 0+0i. Prefer int unless size matters.'],
-        ['pointer, slice, map, channel, func, interface', 'nil. Check nil before use where needed.'],
-        ['array, struct', 'Each element or field gets its own zero value.'],
-      ],
-      code: `<span class="kw">var</span> ok <span class="typ">bool</span>               <span class="com">// false</span>\n<span class="kw">var</span> name <span class="typ">string</span>           <span class="com">// ""</span>\n<span class="kw">var</span> scores []<span class="typ">int</span>          <span class="com">// nil slice</span>\n<span class="kw">var</span> seen <span class="kw">map</span>[<span class="typ">string</span>]<span class="typ">bool</span>  <span class="com">// nil map</span>\n<span class="kw">var</span> u <span class="typ">User</span>                <span class="com">// fields zeroed</span>`,
-    },
-    {
-      title: 'Control flow',
-      ref: 'https://go.dev/ref/spec#Statements',
-      items: [
-        ['if', 'Initializer allowed: if x := f(); x > 0 { ... }. No parentheses required.'],
-        ['for', 'The only loop keyword: for, for condition, for init; condition; post, and for range.'],
-        ['switch', 'Cases break automatically. Use fallthrough explicitly. Type switches inspect interface values.'],
-        ['defer', 'Runs after the surrounding function returns, in last-in-first-out order.'],
-        ['panic / recover', 'For exceptional paths. recover only works inside deferred functions.'],
-      ],
-      code: `<span class="kw">for</span> i, v := <span class="kw">range</span> values {\n    <span class="kw">if</span> v == <span class="str">"skip"</span> { <span class="kw">continue</span> }\n    <span class="kw">switch</span> {\n    <span class="kw">case</span> i == <span class="num">0</span>: fmt.Println(<span class="str">"first"</span>)\n    <span class="kw">default</span>:     fmt.Println(v)\n    }\n}`,
-    },
-    {
-      title: 'Functions, methods, interfaces',
-      ref: 'https://go.dev/ref/spec#Function_declarations',
-      items: [
-        ['multiple returns', 'Return values can be named; errors are conventionally the last return value.'],
-        ['methods', 'Receiver goes before the method name: func (b *Buffer) Write(p []byte) (int, error).'],
-        ['interfaces', 'A type implements an interface implicitly by having the required methods.'],
-        ['embedding', 'Embed fields or interfaces to promote methods and compose behavior.'],
-      ],
-      code: `<span class="kw">type</span> Reader <span class="kw">interface</span> {\n    Read(p []<span class="typ">byte</span>) (n <span class="typ">int</span>, err <span class="typ">error</span>)\n}\n\n<span class="kw">func</span> (u User) Greet() <span class="typ">string</span> {\n    <span class="kw">return</span> <span class="str">"hi "</span> + u.Name\n}`,
-    },
-    {
-      title: 'Slices, maps, structs',
-      ref: 'https://go.dev/ref/spec#Composite_literals',
-      items: [
-        ['slice', 'Descriptor over an array: pointer, length, capacity. append may allocate a new backing array.'],
-        ['map', 'Reference type. Reading a missing key returns zero value plus optional ok flag.'],
-        ['struct', 'Value type with named fields; tags are string metadata used by packages like encoding/json.'],
-        ['make vs new', 'make initializes slice, map, channel. new(T) returns *T pointing at zero value.'],
-      ],
-      code: `<span class="kw">type</span> Config <span class="kw">struct</span> {\n    Port <span class="typ">int</span>    <span class="str">\`json:"port"\`</span>\n}\n\nnums := []<span class="typ">int</span>{<span class="num">1</span>, <span class="num">2</span>}\nnums = <span class="kw">append</span>(nums, <span class="num">3</span>)\n\ncounts := <span class="kw">map</span>[<span class="typ">string</span>]<span class="typ">int</span>{<span class="str">"go"</span>: <span class="num">1</span>}\nn, ok := counts[<span class="str">"go"</span>]`,
-    },
-    {
-      title: 'Errors and testing',
-      ref: 'https://go.dev/doc/tutorial/handle-errors',
-      items: [
-        ['error', 'An interface: type error interface { Error() string }. Return errors; do not hide them.'],
-        ['wrapping', 'fmt.Errorf("open config: %w", err) preserves the cause for errors.Is and errors.As.'],
-        ['tests', 'Files end in _test.go. Functions are TestXxx(t *testing.T). Run go test ./...'],
-        ['table tests', 'Use slices of cases for readable examples and edge cases.'],
-      ],
-      code: `got, err := Load(path)\n<span class="kw">if</span> err != <span class="kw">nil</span> {\n    <span class="kw">return</span> fmt.Errorf(<span class="str">"load %s: %w"</span>, path, err)\n}\n\n<span class="kw">func</span> TestLoad(t *testing.T) {\n    t.Run(<span class="str">"missing file"</span>, <span class="kw">func</span>(t *testing.T) { ... })\n}`,
-    },
-    {
-      title: 'Concurrency',
-      ref: 'https://go.dev/ref/spec#Go_statements',
-      items: [
-        ['goroutine', 'go f() starts f concurrently in the same address space. Coordinate ownership of shared data.'],
-        ['channel', 'Typed pipe: ch <- v sends, v := <-ch receives, close(ch) signals no more sends.'],
-        ['select', 'Waits on multiple channel operations; default makes it non-blocking.'],
-        ['context', 'Pass context.Context for cancellation, deadlines, and request-scoped values.'],
-      ],
-      code: `ctx, cancel := context.WithTimeout(context.Background(), time.Second)\n<span class="kw">defer</span> cancel()\n\nresults := <span class="kw">make</span>(<span class="kw">chan</span> Result)\n<span class="kw">go func</span>() { results <- Work(ctx) }()\n\n<span class="kw">select</span> {\n<span class="kw">case</span> r := <-results: fmt.Println(r)\n<span class="kw">case</span> <-ctx.Done(): <span class="kw">return</span> ctx.Err()\n}`,
-    },
-    {
-      title: 'Toolbox commands',
-      ref: 'https://pkg.go.dev/cmd/go',
-      items: [
-        ['go mod init example.com/app', 'Create go.mod for a module.'],
-        ['go run .', 'Build and run the package in the current directory.'],
-        ['go test ./...', 'Run all tests in the module. Add -race to catch data races.'],
-        ['go fmt ./...', 'Format source code. gofmt is non-negotiable Go style.'],
-        ['go vet ./...', 'Static checks for suspicious code.'],
-        ['go doc fmt.Println', 'Read documentation from the terminal.'],
-      ],
-      code: `$ go mod init example.com/app\n$ go fmt ./...\n$ go test -race ./...\n$ go vet ./...\n$ go build ./cmd/server`,
-    },
-  ];
-
-  const operators = [
-    [':=', 'short variable declaration, only inside functions', 'name := "gopher"'],
-    ['...', 'variadic parameter or argument expansion', 'fmt.Println(items...)\nfunc sum(xs ...int) int'],
-    ['& / *', 'address-of and pointer dereference', 'p := &count\nfmt.Println(*p)'],
-    ['<-', 'channel send or receive', 'ch <- value\nvalue := <-ch'],
-    ['.(T)', 'type assertion', 's, ok := v.(string)'],
-    ['T(v)', 'conversion, not a cast with magic', 'n := int64(count)'],
-  ];
-
-  const proverbs = [
-    'Don’t communicate by sharing memory; share memory by communicating.',
-    'Clear is better than clever.',
-    'A little copying is better than a little dependency.',
-    'Errors are values.',
-    'The bigger the interface, the weaker the abstraction.',
-    'Make the zero value useful.',
-    'Gofmt’s style is no one’s favorite, yet gofmt is everyone’s favorite.',
-    'Documentation is for users.',
-    'Concurrency is not parallelism.',
-  ];
-
-  const checklist = [
-    'Run <code>gofmt</code>.',
-    'Run <code>go test ./...</code>.',
-    'Return errors; do not panic for normal failures.',
-    'Keep interfaces small.',
-    'Prefer simple structs and functions first.',
-    'Use <code>context.Context</code> for cancellation across API boundaries.',
-  ];
-
-  const traps = [
-    ['nil slice vs empty slice', 'Both have length 0, but JSON and API behavior may differ.'],
-    ['nil map cannot be assigned into', 'Initialize with make(map[K]V) or a map literal before writes.'],
-    ['loop variable capture', 'Pass loop values into goroutines/closures when needed.'],
-    ['append may allocate', 'Keep the returned slice: s = append(s, v).'],
-    ['map iteration order', 'It is intentionally unspecified; sort keys when order matters.'],
-    ['pointer vs value receiver', 'Pointer receivers can mutate and avoid copying; method sets differ.'],
-    ['exported names need comments', 'Public package identifiers should document what users need to know.'],
-  ];
-
-  const whenToUse = [
-    ['array', 'rarely; fixed size is part of the type'],
-    ['slice', 'usually; flexible view over an array'],
-    ['map', 'lookup by key'],
-    ['struct', 'data shape with named fields'],
-    ['interface', 'behavior and boundaries'],
-    ['channel', 'coordination or ownership transfer'],
-    ['mutex', 'protect shared state'],
-  ];
-
-  const toggleTheme = () => (state.theme = state.theme === 'dark' ? 'light' : 'dark');
+  function selectItem(id) {
+    state.selectedId = id;
+    state.sidebarOpen = false;
+  }
 </script>
 
-<svelte:head>
-  <title>Go Concepts & Syntax</title>
-  <meta
-    name="description"
-    content="A visual Go cheat sheet covering packages, declarations, types, functions, errors, concurrency, and commands."
-  />
-</svelte:head>
+<div class="layout" style:background-color={colors.paper} style:color={colors.ink}>
+  <button
+    type="button"
+    class="hamburger"
+    class:open={state.sidebarOpen}
+    style:background-color={colors.panel}
+    style:border-color={colors.rule}
+    style:color={colors.ink}
+    aria-label={state.sidebarOpen ? 'Close navigation' : 'Open navigation'}
+    aria-expanded={state.sidebarOpen}
+    onclick={() => (state.sidebarOpen = !state.sidebarOpen)}
+  >
+    <span></span><span></span><span></span>
+  </button>
 
-<div
-  class="app"
-  style:background-color={colors.paper}
-  style:color={colors.ink}
-  style:--paper={colors.paper}
-  style:--panel={colors.panel}
-  style:--panel2={colors.panel2}
-  style:--ink={colors.ink}
-  style:--muted={colors.muted}
-  style:--rule={colors.rule}
-  style:--soft={colors.soft}
-  style:--glow={colors.glow}
-  style:--kw={syntax.kw}
-  style:--str={syntax.str}
-  style:--com={syntax.com}
-  style:--typ={syntax.typ}
-  style:--fun={syntax.fun}
-  style:--num={syntax.num}
-  style:--op={syntax.op}
->
-  <div class="shell">
-    <header class="hero">
-      <div>
-        <div class="eyebrow">HOW TO GO</div>
-        <h1>Go Concepts & Syntax</h1>
-        <p>
-          A visual cheat sheet for core Go ideas: module, package, declarations, types,
-          control flow, errors, tests, concurrency, and the go command.
-        </p>
-      </div>
-      <button class="theme-button" type="button" onclick={toggleTheme} aria-label="Switch theme">
-        <span>{state.theme === 'dark' ? '☾' : '☀'}</span>
-      </button>
-    </header>
+  {#if state.sidebarOpen}
+    <button
+      type="button"
+      class="backdrop"
+      aria-label="Close navigation"
+      onclick={() => (state.sidebarOpen = false)}
+    ></button>
+  {/if}
 
-    <section class="workspace" aria-label="Go hierarchy">
-      <div class="editor-card">
-        <div class="titlebar">
-          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-          <span class="tab">greeter.go</span>
+  <nav
+    class="list"
+    class:open={state.sidebarOpen}
+    style:background-color={colors.panel}
+    style:border-color={colors.rule}
+  >
+    <div class="brand" style:border-color={colors.rule}>
+      <div class="brand-title" style:color={colors.accent}>How To Go</div>
+      <div class="brand-sub" style:color={colors.muted}>Concepts &amp; Syntax</div>
+    </div>
+
+    {#each sections as section (section.title)}
+      <div class="section">
+        <div
+          class="section-title"
+          style:color={section.hue}
+          style:border-color={colors.rule}
+        >
+          {section.title}
         </div>
-
-        <div class="hierarchy-pad">
-          <Scope lv="module" tagRight="go.mod">
-            <pre><span class="com">// go.mod</span>{NL}<span class="kw">module</span> <Tok lv="module">github.com/alex/greeter</Tok>{NL}<span class="kw">go</span> 1.22</pre>
-
-            <Scope lv="pkg" tagRight="directory: greeter/">
-            <pre><span class="com">// all files in this directory share one package clause</span>{NL}<span class="kw">package</span> <Tok lv="pkg">greeter</Tok></pre>
-
-            <Scope lv="file" tagRight="source file">
-              <pre><span class="kw">package</span> greeter</pre>
-
-              <Scope lv="imp"><pre><span class="kw">import</span> ({NL}{I4}<Tok lv="imp"><span class="str">"fmt"</span></Tok>{NL}{I4}<Tok lv="imp"><span class="str">"strings"</span></Tok>{NL})</pre></Scope>
-              <Scope lv="konst"><pre><span class="kw">const</span> <Tok lv="konst">Greeting</Tok> = <span class="str">"Hello"</span></pre></Scope>
-              <Scope lv="vvar"><pre><span class="kw">var</span> <Tok lv="vvar">defaultName</Tok> <span class="typ">string</span> = <span class="str">"world"</span></pre></Scope>
-              <Scope lv="typ" tagRight="struct"><pre><span class="kw">type</span> <Tok lv="typ"><span class="typ">Person</span></Tok> <span class="kw">struct</span> &lbrace;{NL}{I4}<Tok lv="field">Name</Tok> <span class="typ">string</span>{NL}{I4}<Tok lv="field">Age</Tok>  <span class="typ">int</span>{NL}&rbrace;</pre></Scope>
-              <Scope lv="method" tagRight="receiver"><pre><span class="kw">func</span> (<Tok lv="param">p</Tok> <span class="typ">Person</span>) <Tok lv="method">Hello</Tok>() <span class="typ">string</span> &lbrace;{NL}{I4}<Tok lv="stmt"><span class="kw">return</span> fmt.Sprintf(<span class="str">"%s, %s"</span>, Greeting, p.Name)</Tok>{NL}&rbrace;</pre></Scope>
-              <Scope lv="fn"><pre><span class="kw">func</span> <Tok lv="fn">Shout</Tok>(<Tok lv="param">s</Tok> <span class="typ">string</span>) <span class="typ">string</span> &lbrace;{NL}{I4}<Tok lv="stmt"><span class="kw">return</span> strings.ToUpper(s) + <span class="str">"!"</span></Tok>{NL}&rbrace;</pre></Scope>
-            </Scope>
-            </Scope>
-          </Scope>
-        </div>
-      </div>
-
-      <aside class="legend" aria-label="Hierarchy legend">
-        <div class="panel-title">Hover map</div>
-        {#each Object.entries(levels) as [k, v] (k)}
-          {@const active = state.hover === k}
-          <div
-            class="legend-row"
-            class:active
-            onmouseenter={() => (state.hover = k)}
-            onmouseleave={() => (state.hover = null)}
-            style:--accent={v.hue}
-          >
-            <strong>{v.label}</strong>
-            <span>{v.desc}</span>
-          </div>
-        {/each}
-      </aside>
-    </section>
-
-    <section class="quick-grid" aria-label="quick reference">
-      <div class="note-card">
-        <div class="panel-title">Mental model</div>
-        <p><strong>Small interfaces, explicit errors, simple composition.</strong> Go code tends to be clearest when data ownership and control flow are visible.</p>
-      </div>
-      <div class="note-card">
-        <div class="panel-title">Export rule</div>
-        <p><strong>Capitalized identifiers are exported:</strong> User, NewClient, ErrClosed. lowerCase stays package-private.</p>
-      </div>
-      <div class="note-card">
-        <div class="panel-title">Formatting rule</div>
-        <p><strong>Run gofmt.</strong> Style arguments are mostly over because the formatter decides layout for everyone.</p>
-      </div>
-    </section>
-
-    <main class="cheatsheet" aria-label="Go cheat sheet">
-      {#each cheats as section}
-        <article class="cheat-card">
-          <div class="cheat-head">
-            <h2>{section.title}</h2>
-            <a href={section.ref} target="_blank" rel="noreferrer">official reference ↗</a>
-          </div>
-          <div class="cheat-body">
-            <dl>
-              {#each section.items as [term, desc]}
-                <div>
-                  <dt>{term}</dt>
-                  <dd>{desc}</dd>
-                </div>
-              {/each}
-            </dl>
-            <pre class="snippet">{@html section.code}</pre>
-          </div>
-        </article>
-      {/each}
-    </main>
-
-    <section class="operators" aria-label="operators and syntax marks">
-      <div class="cheat-head">
-        <h2>Syntax marks worth memorizing</h2>
-        <a href="https://go.dev/ref/spec#Operators_and_punctuation" target="_blank" rel="noreferrer">operators and punctuation ↗</a>
-      </div>
-      <div class="operator-grid">
-        {#each operators as [mark, meaning, example]}
-          <div>
-            <code>{mark}</code>
-            <span>{meaning}</span>
-            <pre class="operator-example">{example}</pre>
-          </div>
-        {/each}
-      </div>
-    </section>
-
-    <section class="mindset" aria-label="Go mindset">
-      <div class="cheat-head">
-        <h2>Go Mindset</h2>
-      </div>
-      <div class="mindset-body">
-        <div>
-          <div class="panel-title source-title">
-            Proverbs
-            <a href="https://go-proverbs.github.io/" target="_blank" rel="noreferrer">Go Proverbs by Rob Pike ↗</a>
-          </div>
-          <ul class="proverb-list">
-            {#each proverbs as proverb}
-              <li>{proverb}</li>
-            {/each}
-          </ul>
-        </div>
-        <div>
-          <div class="panel-title">Beginner checklist</div>
-          <ul class="check-list">
-            {#each checklist as item}
-              <li>{@html item}</li>
-            {/each}
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="reminders" aria-label="Go reminders">
-      <article class="reminder-card">
-        <div class="cheat-head">
-          <h2>Common traps</h2>
-        </div>
-        <dl>
-          {#each traps as [term, desc]}
-            <div>
-              <dt>{term}</dt>
-              <dd>{desc}</dd>
-            </div>
+        <ul>
+          {#each section.items as item (item.id)}
+            {@const active = state.selectedId === item.id}
+            <li>
+              <button
+                type="button"
+                class="item"
+                class:active
+                style:color={active ? section.hue : colors.ink}
+                style:border-left-color={active ? section.hue : 'transparent'}
+                style:background-color={active ? section.hue + '1f' : 'transparent'}
+                onclick={() => selectItem(item.id)}
+              >
+                <span class="label">{item.label}</span>
+                {#if item.hint}
+                  <span class="hint" style:color={colors.muted}>{item.hint}</span>
+                {/if}
+              </button>
+            </li>
           {/each}
-        </dl>
-      </article>
-      <article class="reminder-card">
-        <div class="cheat-head">
-          <h2>When to use what</h2>
+        </ul>
+      </div>
+    {/each}
+  </nav>
+
+  <section class="pane">
+    {#if selected}
+      <div class="pane-head" style:border-color={colors.rule}>
+        <div class="pane-eyebrow" style:color={selectedSection?.hue ?? colors.muted}>
+          {selectedSection?.title ?? ''}
         </div>
-        <dl>
-          {#each whenToUse as [term, desc]}
-            <div>
-              <dt>{term}</dt>
-              <dd>{desc}</dd>
-            </div>
-          {/each}
-        </dl>
-      </article>
-    </section>
-
-    <section class="references" aria-label="Go references">
-      <div class="cheat-head">
-        <h2>References</h2>
+        <div class="pane-title-row">
+          <h2 style:color={colors.ink}>{selected.label}</h2>
+          {#if selected.ref}
+            <a
+              class="ref"
+              href={selected.ref}
+              target="_blank"
+              rel="noreferrer"
+              style:color={selectedSection?.hue ?? colors.accent}
+            >
+              official reference ↗
+            </a>
+          {/if}
+        </div>
+        {#if selected.summary}
+          <p style:color={colors.muted}>{@html selected.summary}</p>
+        {/if}
       </div>
-      <div class="reference-grid">
-        <a href="https://go.dev/ref/spec" target="_blank" rel="noreferrer">
-          <strong>Go documentation</strong>
-          <span>Language specification: syntax and semantics.</span>
-        </a>
-        <a href="https://go.dev/doc/effective_go" target="_blank" rel="noreferrer">
-          <strong>Effective Go</strong>
-          <span>Idioms, naming, interfaces, errors, and style.</span>
-        </a>
-        <a href="https://pkg.go.dev/" target="_blank" rel="noreferrer">
-          <strong>pkg.go.dev</strong>
-          <span>Standard library and module documentation.</span>
-        </a>
-        <a href="https://go.dev/play/" target="_blank" rel="noreferrer">
-          <strong>Go Playground</strong>
-          <span>Run small snippets in the browser.</span>
-        </a>
-        <a href="https://gobyexample.com/" target="_blank" rel="noreferrer">
-          <strong>Go by Example</strong>
-          <span>Practical examples for common features.</span>
-        </a>
-        <a href="https://go.dev/wiki/CodeReviewComments" target="_blank" rel="noreferrer">
-          <strong>Code Review Comments</strong>
-          <span>Concise advice from real Go reviews.</span>
-        </a>
-      </div>
-    </section>
 
-    <footer>
-      <span>Core Go ideas in one visual reference: packages, types, errors, tests, concurrency, and tools.</span>
-    </footer>
-  </div>
+      {#if selected.code}
+        <pre class="code"><code class="hljs language-go">{@html highlighted}</code></pre>
+      {/if}
+    {/if}
+  </section>
 </div>
 
 <style>
-  :global(html) { scroll-behavior: smooth; }
   :global(body) {
-    margin: 0;
-    background: var(--paper, #0d1117);
+    background-color: #15130f;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    height: 100vh;
+    width: 100vw;
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
-  :global(*), :global(*::before), :global(*::after) { box-sizing: border-box; }
-  .app { min-height: 100vh; transition: background-color 120ms ease, color 120ms ease; }
-  .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 44px; }
-  .hero { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; margin-bottom: 28px; }
-  .eyebrow, .panel-title { color: var(--muted); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; }
-  .eyebrow { margin-bottom: 18px; }
-  h1, h2, p { margin: 0; }
-  h1 { max-width: 850px; font-size: clamp(34px, 6vw, 72px); line-height: .95; letter-spacing: -0.06em; }
-  .hero p { max-width: 760px; margin-top: 18px; color: var(--muted); line-height: 1.7; font-size: 15px; }
-  .theme-button { border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 78%, transparent); color: var(--muted); border-radius: 999px; width: 42px; height: 42px; padding: 0; font: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.14); display: inline-grid; place-items: center; }
-  .theme-button span { display: inline-block; width: 1.4em; }
-  .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
-  .editor-card, .legend, .cheat-card, .note-card, .operators, .references, .mindset, .reminder-card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--rule); border-radius: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
-  .editor-card { overflow: hidden; }
-  .hierarchy-pad { padding: 0 16px 16px; }
-  .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--rule); background: rgba(127,127,127,.06); color: var(--muted); }
-  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-  .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
-  .tab { margin-left: 10px; font-size: 12px; }
-  pre { margin: 0; overflow-x: auto; font: 13px/1.7 'JetBrains Mono', ui-monospace, monospace; white-space: pre; color: var(--ink); }
-  :global(.kw) { color: var(--kw); font-weight: 650; } :global(.str) { color: var(--str); } :global(.com) { color: var(--com); font-style: italic; } :global(.typ) { color: var(--typ); } :global(.num) { color: var(--num); }
-  .legend { position: sticky; top: 18px; padding: 16px; }
-  .legend-row { border-left: 3px solid transparent; padding: 9px 10px; border-radius: 8px; cursor: help; }
-  .legend-row.active { border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
-  .legend-row strong { display: block; color: var(--accent); font-size: 11px; letter-spacing: .14em; }
-  .legend-row span { display: block; color: var(--muted); margin-top: 4px; font-size: 12px; line-height: 1.45; }
-  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 22px 0; }
-  .note-card { padding: 18px; }
-  .note-card p { margin-top: 10px; color: var(--muted); line-height: 1.6; font-size: 13px; }
-  .note-card strong { color: var(--ink); }
-  .cheatsheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-  .cheat-card { overflow: hidden; display: flex; flex-direction: column; }
-  .cheat-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; padding: 18px 18px 12px; border-bottom: 1px solid var(--rule); }
-  h2 { font-size: 18px; letter-spacing: -0.03em; }
-  a { color: #58a6ff; text-decoration: none; font-size: 12px; white-space: nowrap; }
-  a:hover { text-decoration: underline; }
-  .cheat-body { display: flex; flex-direction: column; flex: 1; }
-  dl { margin: 0; padding: 14px 18px; }
-  dl div { display: grid; grid-template-columns: 155px 1fr; gap: 16px; padding: 9px 0; border-bottom: 1px dashed var(--rule); }
-  dl div:last-child { border-bottom: 0; }
-  dt { color: var(--op); font-weight: 700; font-size: 13px; }
-  dd { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
-  .snippet { flex: 1; border-top: 1px solid var(--rule); background: rgba(0,0,0,.16); padding: 16px 18px; font-size: 12.5px; }
-  .operators, .references, .mindset { margin-top: 18px; overflow: hidden; }
-  .operator-grid, .reference-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
-  .operator-grid { grid-template-columns: repeat(2, 1fr); }
-  .operator-grid div, .reference-grid a { background: var(--panel); padding: 14px 16px; display: grid; gap: 8px; }
-  code { color: var(--op); font-weight: 800; font-size: 16px; }
-  .operator-grid span, .reference-grid span { color: var(--muted); font-size: 13px; line-height: 1.45; }
-  .operator-example { background: rgba(0,0,0,.16); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.55; }
-  .reference-grid a { white-space: normal; transition: background-color 120ms ease; }
-  .reference-grid a:hover { background: var(--soft); text-decoration: none; }
-  .reference-grid strong { color: var(--op); font-size: 13px; }
-  .mindset-body { display: grid; grid-template-columns: 1.25fr .75fr; gap: 1px; background: var(--rule); }
-  .mindset-body > div { background: var(--panel); padding: 18px; }
-  .proverb-list, .check-list { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.65; }
-  .proverb-list li::marker, .check-list li::marker { color: var(--op); }
-  .source-title { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
-  .source-title a { letter-spacing: 0; text-transform: none; font-weight: 500; }
-  :global(.check-list code) { color: var(--op); background: rgba(0,0,0,.16); border: 1px solid var(--rule); border-radius: 6px; padding: 1px 5px; font-size: 12px; }
-  .reminders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
-  .reminder-card { overflow: hidden; }
-  footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; line-height: 1.5; }
-  @media (max-width: 960px) {
-    .workspace, .cheatsheet, .quick-grid, .mindset-body, .reminders { grid-template-columns: 1fr; }
-    .legend { position: static; }
+
+  .list {
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid;
+    padding: 0 0 18px;
   }
-  @media (max-width: 620px) {
-    .shell { width: min(100% - 36px, 1180px); padding-top: 16px; }
-    .hero { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
-    .theme-button { width: 34px; height: 34px; box-shadow: 0 1px 2px rgba(0,0,0,.14); }
-    dl div { grid-template-columns: 1fr; gap: 4px; }
-    .operator-grid, .reference-grid { grid-template-columns: 1fr; }
-    footer { flex-direction: column; }
+
+  .brand {
+    padding: 16px;
+    border-bottom: 1px solid;
+    margin-bottom: 14px;
+  }
+  .brand-title {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .brand-sub {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+
+  .section + .section {
+    margin-top: 22px;
+  }
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0 16px 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed;
+  }
+  .list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-left: 3px solid transparent;
+    padding: 7px 14px 7px 13px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    position: relative;
+  }
+  .item:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+  .item .label {
+    flex: 0 0 auto;
+  }
+  .item .hint {
+    font-size: 12px;
+  }
+
+  .pane {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 36px 40px 48px;
+    max-width: 880px;
+  }
+  .pane-head {
+    border-bottom: 1px solid;
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+  }
+  .pane-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .pane-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pane-head h2 {
+    font-family: inherit;
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0;
+  }
+  .pane-head .ref {
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .pane-head .ref:hover {
+    text-decoration: underline;
+  }
+  .pane-head p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 10px 0 0;
+  }
+  .pane-head p :global(code) {
+    font-family: inherit;
+    color: #e6e2d8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid #3a352e;
+    border-radius: 4px;
+    padding: 0 4px;
+    font-size: 13px;
+  }
+
+  .code {
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0;
+    overflow-x: auto;
+  }
+  .code code {
+    font-family: inherit;
+    background: transparent;
+    padding: 0;
+    white-space: pre;
+    display: block;
+  }
+
+  /* hljs token colors tuned for the warm dark palette */
+  :global(.hljs) { background: transparent; color: #e6e2d8; }
+  :global(.hljs-comment),
+  :global(.hljs-quote)         { color: #847b6e; font-style: italic; }
+  :global(.hljs-keyword),
+  :global(.hljs-selector-tag),
+  :global(.hljs-literal)       { color: #e89868; }
+  :global(.hljs-string),
+  :global(.hljs-regexp),
+  :global(.hljs-doctag)        { color: #b6c382; }
+  :global(.hljs-number)        { color: #dba87e; }
+  :global(.hljs-type),
+  :global(.hljs-built_in),
+  :global(.hljs-builtin-name)  { color: #9bc7c1; }
+  :global(.hljs-title),
+  :global(.hljs-title.function_),
+  :global(.hljs-section)       { color: #dccea0; }
+  :global(.hljs-params),
+  :global(.hljs-variable),
+  :global(.hljs-attr)          { color: #e6e2d8; }
+  :global(.hljs-meta)          { color: #9ab1d4; }
+  :global(.hljs-symbol),
+  :global(.hljs-bullet)        { color: #c5a5cc; }
+
+  /* hamburger + backdrop, hidden on desktop */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 30;
+    width: 40px;
+    height: 40px;
+    padding: 10px 9px;
+    border: 1px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    font: inherit;
+  }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 1px;
+    transition: transform 180ms ease, opacity 180ms ease;
+    transform-origin: center;
+  }
+  .hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  @media (max-width: 820px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .pane {
+      padding: 64px 20px 32px;
+      max-width: none;
+    }
+    .hamburger {
+      display: flex;
+    }
+    .backdrop {
+      display: block;
+    }
+    .list {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      max-width: 85vw;
+      z-index: 25;
+      transform: translateX(-100%);
+      transition: transform 220ms ease;
+      box-shadow: 6px 0 24px rgba(0, 0, 0, 0.4);
+    }
+    .list.open {
+      transform: translateX(0);
+    }
   }
 </style>
