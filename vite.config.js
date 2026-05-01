@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import content from './vite-plugin-content.js';
 
 const silencedA11y = new Set([
   'a11y_no_static_element_interactions',
@@ -9,6 +10,7 @@ const silencedA11y = new Set([
 
 export default defineConfig({
   plugins: [
+    content({ dir: 'content' }),
     svelte({
       onwarn(warning, defaultHandler) {
         if (silencedA11y.has(warning.code)) return;

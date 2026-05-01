@@ -93,18 +93,27 @@
         <div class="pane-eyebrow" style:color={selectedSection?.hue ?? colors.muted}>
           {selectedSection?.title ?? ''}
         </div>
-        <h2 style:color={colors.ink}>{selected.label}</h2>
+        <div class="pane-title-row">
+          <h2 style:color={colors.ink}>{selected.label}</h2>
+          {#if selected.ref}
+            <a
+              class="ref"
+              href={selected.ref}
+              target="_blank"
+              rel="noreferrer"
+              style:color={selectedSection?.hue ?? colors.accent}
+            >
+              official reference ↗
+            </a>
+          {/if}
+        </div>
         {#if selected.summary}
-          <p style:color={colors.muted}>{selected.summary}</p>
+          <p style:color={colors.muted}>{@html selected.summary}</p>
         {/if}
       </div>
 
       {#if selected.code}
         <pre class="code"><code class="hljs language-go">{@html highlighted}</code></pre>
-      {:else}
-        <div class="placeholder" style:color={colors.muted}>
-          No example yet.
-        </div>
       {/if}
     {/if}
   </section>
@@ -210,16 +219,40 @@
     text-transform: uppercase;
     margin-bottom: 8px;
   }
+  .pane-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
   .pane-head h2 {
     font-family: inherit;
     font-size: 24px;
     font-weight: 500;
     margin: 0;
   }
+  .pane-head .ref {
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .pane-head .ref:hover {
+    text-decoration: underline;
+  }
   .pane-head p {
     font-size: 14px;
     line-height: 1.6;
     margin: 10px 0 0;
+  }
+  .pane-head p :global(code) {
+    font-family: inherit;
+    color: #e6e2d8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid #3a352e;
+    border-radius: 4px;
+    padding: 0 4px;
+    font-size: 13px;
   }
 
   .code {
@@ -260,13 +293,6 @@
   :global(.hljs-meta)          { color: #9ab1d4; }
   :global(.hljs-symbol),
   :global(.hljs-bullet)        { color: #c5a5cc; }
-
-  .placeholder {
-    font-style: italic;
-    font-size: 14px;
-    padding: 40px 0;
-    text-align: center;
-  }
 
   /* hamburger + backdrop, hidden on desktop */
   .hamburger {
