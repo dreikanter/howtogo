@@ -369,5 +369,8 @@
     .list.open {
       transform: translateX(0);
     }
+    .brand {
+      padding-left: 64px;
+    }
   }
 </style>
