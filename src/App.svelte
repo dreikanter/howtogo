@@ -136,15 +136,15 @@
     margin-bottom: 14px;
   }
   .brand-title {
-    font-size: 14.5px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.01em;
   }
   .brand-sub {
-    font-size: 10.5px;
+    font-size: 11px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    margin-top: 4px;
+    margin-top: 5px;
   }
 
   .section + .section {
@@ -171,10 +171,10 @@
     background: transparent;
     border: 0;
     border-left: 3px solid transparent;
-    padding: 6px 14px 6px 13px;
+    padding: 7px 14px 7px 13px;
     cursor: pointer;
     font: inherit;
-    font-size: 12.5px;
+    font-size: 14px;
     line-height: 1.4;
     transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease;
     display: flex;
@@ -189,7 +189,7 @@
     flex: 0 0 auto;
   }
   .item .hint {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .pane {
@@ -212,19 +212,19 @@
   }
   .pane-head h2 {
     font-family: inherit;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 500;
     margin: 0;
   }
   .pane-head p {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
-    margin: 8px 0 0;
+    margin: 10px 0 0;
   }
 
   .code {
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.7;
     margin: 0;
     overflow-x: auto;
@@ -263,7 +263,7 @@
 
   .placeholder {
     font-style: italic;
-    font-size: 13px;
+    font-size: 14px;
     padding: 40px 0;
     text-align: center;
   }
