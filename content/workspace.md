@@ -9,7 +9,7 @@ Groups multiple modules for local development. Lets you edit several modules at 
 
 ```go
 // go.work — at the top of a multi-module checkout
-go 1.22
+go 1.26
 
 use (
     ./greeter
